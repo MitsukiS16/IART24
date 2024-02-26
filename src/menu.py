@@ -59,6 +59,12 @@ def book_scanning_menu():
 
         if selected_algorithm:
             selected_algorithm(inputfile)
+            choice = input("Press 0 to go back to main menu.\n")
+            if choice == '0':
+                menu()
+            else:
+                print("Invalid choice. Please enter a valid option.")
+                best_score_menu()
         else:
             print("Invalid choice. Please enter a valid option.")
             best_scanning_menu()
