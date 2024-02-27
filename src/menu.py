@@ -1,3 +1,5 @@
+########################################
+# Imports 
 import sys
 import os
 
@@ -6,18 +8,10 @@ from algorithms import algorithm2
 from algorithms import algorithm3
 
 
-
 # Exit Menu Function
 def exit_application():
     print("Exiting the application. Goodbye!")
     sys.exit()
-
-
-
-# Function Test Yet to be done 
-def idkyet():
-    print("Not yet implemented")
-
 
 
 # Book Scanning Menu Function
@@ -42,16 +36,16 @@ def book_scanning_menu():
         print("-------------------------------------------------------------")
         print("| Please select the algorithm:                              |")
         print("| 1. Algorithm 1                                            |")
-        print("| 2. Algorithm 2                                            |")
-        print("| 3. Algorithm 3                                            |")
+        # print("| 2. Algorithm 2                                            |")
+        # print("| 3. Algorithm 3                                            |")
         print("| 0. Main Menu                                              |")
         print("-------------------------------------------------------------")
         inputalgorithm = input("Please enter your choice: ")
 
         options = {
             '1': algorithm1,
-            '2': algorithm2,
-            '3': algorithm3,
+            # '2': algorithm2,
+            # '3': algorithm3,
             '0': menu
         }
 
@@ -75,9 +69,6 @@ def book_scanning_menu():
         best_scanning_menu()
 
 
-
-        
-
 # Best Score Menu Function
 def best_score_menu():
     os.system('clear')
@@ -94,12 +85,15 @@ def best_score_menu():
     print("| f_libraries_of_the_world  | 000 000 000 | -               |")
     print("-------------------------------------------------------------")
 
+    # Right now the best is simulated anneling -> 2068681405 
+
     choice = input("Press 0 to go back to main menu.\n")
     if choice == '0':
         menu()
     else:
         print("Invalid choice. Please enter a valid option.")
         best_score_menu()
+
 
 # Main menu Function
 def menu():
