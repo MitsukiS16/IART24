@@ -1,4 +1,3 @@
-# Function to read data from input file
 def read_data(file_path):
     libraries = {}
     scores = []
@@ -7,27 +6,28 @@ def read_data(file_path):
     shipping_days = None
 
     with open(file_path, 'r') as file:
-        i = 0
+        lines = file.readlines()
+
+        # Parsing the first line containing B, L, and D
+        diffbooks, numLibs, shipping_days = map(int, lines[0].split())
+
+        # Parsing the second line containing the scores of individual books
+        scores = list(map(int, lines[1].split()))
+
+        # Parsing library information
+        i = 2  # Start from the third line
         libID = 0
-        islib = False
-        books = {}
-        for line in file:
-            arguments = line.split()
-            if i == 0:
-                diffbooks, numLibs, shipping_days = map(int, arguments)
-            elif i == 1:
-                scores = list(map(int, arguments))
-            elif i > 0 and (len(arguments) > 3 or len(arguments) < 3):
-                for arg in arguments:
-                    books[arg] = scores[int(arg)]
-                libraries[libID].books = books
-            elif i > 0 and len(arguments) == 3:
-                if islib:
-                    libID += 1
-                    islib = False
-                libraries[libID] = Library(int(arguments[0]), int(arguments[1]), int(arguments[2]))
-                islib = True
-            i += 1
-            books = {}
+        while i < len(lines):
+            Nj, Tj, Mj = map(int, lines[i].split())
+            book_ids = list(map(int, lines[i+1].split()))  # Get the book IDs for the current library
+            books = {book_id: scores[book_id] for book_id in book_ids}  # Create a dictionary of book IDs and scores
+            libraries[libID] = {
+                'Nj': Nj,
+                'Tj': Tj,
+                'Mj': Mj,
+                'books': books
+            }
+            libID += 1
+            i += 2  # Move to the next library section
 
     return libraries, diffbooks, numLibs, shipping_days
