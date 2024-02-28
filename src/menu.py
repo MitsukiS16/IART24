@@ -78,7 +78,7 @@ def book_scanning_menu():
         selected_algorithm = options.get(inputalgorithm)
 
         if selected_algorithm:
-            selected_algorithm(file_paths[inputfile],sol_name[init_solution])  # Pass the file path directly
+            selected_algorithm(file_paths[inputfile],init_solution,sol_name[init_solution])  # Pass the file path directly
             choice = input("Press 0 to go back to main menu.\n")
             if choice == '0':
                 menu()
