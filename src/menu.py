@@ -4,8 +4,8 @@ import sys
 import os
 
 from algorithms import algorithm1
-from algorithms import algorithm2
-from algorithms import algorithm3
+#from algorithms import algorithm2
+#from algorithms import algorithm3
 
 
 # Exit Menu Function
@@ -32,7 +32,17 @@ def book_scanning_menu():
     print("-------------------------------------------------------------")
     inputfile = input("Please enter your choice: ")
 
-    if inputfile in ['1', '2', '3', '4', '5', '6']:
+    file_paths = {
+        '1': "../libraries/a_example.txt",
+        '2': "../libraries/b_read_on.txt",
+        '3': "../libraries/c_incunabula.txt",
+        '4': "../libraries/d_tough_choices.txt",
+        '5': "../libraries/e_so_many_books.txt",
+        '6': "../libraries/f_libraries_of_the_world.txt",
+        '0': "0"
+    }
+
+    if inputfile in file_paths:
         print("-------------------------------------------------------------")
         print("| Please select the algorithm:                              |")
         print("| 1. Algorithm 1                                            |")
@@ -52,7 +62,7 @@ def book_scanning_menu():
         selected_algorithm = options.get(inputalgorithm)
 
         if selected_algorithm:
-            selected_algorithm(inputfile)
+            selected_algorithm(file_paths[inputfile])  # Pass the file path directly
             choice = input("Press 0 to go back to main menu.\n")
             if choice == '0':
                 menu()
@@ -67,6 +77,7 @@ def book_scanning_menu():
     else:
         print("Invalid choice. Please enter a valid option.")
         best_scanning_menu()
+
 
 
 # Best Score Menu Function
