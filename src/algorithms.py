@@ -49,7 +49,6 @@ shipping_days = None
 # Main and Auxiliar Functions for Optimization Algorithms
 
 
-
 # Helper function to print algorithm information
 def print_info(alg_name,file_path,init_solution,score):
     print("-------------------------------------------------------------")
@@ -58,7 +57,6 @@ def print_info(alg_name,file_path,init_solution,score):
     print(f"| Initial Solution: {init_solution}")
     print(f"| The final score was: {score}")
     print("-------------------------------------------------------------")
-
 
 
 # Algorithm 3
