@@ -4,8 +4,8 @@ import sys
 import os
 
 from algorithms import algorithm1
-#from algorithms import algorithm2
-#from algorithms import algorithm3
+from algorithms import algorithm2
+from algorithms import algorithm3
 
 
 # Exit Menu Function
@@ -44,25 +44,41 @@ def book_scanning_menu():
 
     if inputfile in file_paths:
         print("-------------------------------------------------------------")
+        print("| Please select the initial solution:                       |")
+        print("| 1. Random Solution                                        |")
+        print("| 2. Trivial Solution                                       |")
+        print("| 3. Greedy Constrution                                     |")
+        print("| 0. Main Menu                                              |")
+        print("-------------------------------------------------------------")
+        init_solution = input("Please enter your choice: ")
+
+        sol_name = {
+        '1': "Random Solution",
+        '2': "Trivial Solution",
+        '3': "Greedy Constrution",
+        '0': "0"
+    }
+
+        print("-------------------------------------------------------------")
         print("| Please select the algorithm:                              |")
         print("| 1. Algorithm 1                                            |")
-        # print("| 2. Algorithm 2                                            |")
-        # print("| 3. Algorithm 3                                            |")
+        print("| 2. Algorithm 2                                            |")
+        print("| 3. Algorithm 3                                            |")
         print("| 0. Main Menu                                              |")
         print("-------------------------------------------------------------")
         inputalgorithm = input("Please enter your choice: ")
 
         options = {
             '1': algorithm1,
-            # '2': algorithm2,
-            # '3': algorithm3,
+            '2': algorithm2,
+            '3': algorithm3,
             '0': menu
         }
 
         selected_algorithm = options.get(inputalgorithm)
 
         if selected_algorithm:
-            selected_algorithm(file_paths[inputfile])  # Pass the file path directly
+            selected_algorithm(file_paths[inputfile],sol_name[init_solution])  # Pass the file path directly
             choice = input("Press 0 to go back to main menu.\n")
             if choice == '0':
                 menu()
@@ -84,19 +100,17 @@ def book_scanning_menu():
 def best_score_menu():
     os.system('clear')
 
-    print("-------------------------------------------------------------")
-    print("| Best Score Menu                                           |")
-    print("-------------------------------------------------------------")
-    print("| File                      | Score       | Algorithm       |")
-    print("| a_example                 | 000 000 000 | -               |")
-    print("| b_read_on                 | 000 000 000 | -               |")
-    print("| c_incunabula              | 000 000 000 | -               |")
-    print("| d_tough_choices           | 000 000 000 | -               |")
-    print("| e_so_many_books           | 000 000 000 | -               |")
-    print("| f_libraries_of_the_world  | 000 000 000 | -               |")
-    print("-------------------------------------------------------------")
-
-    # Right now the best is simulated anneling -> 2068681405 
+    print("--------------------------------------------------------------------------------")
+    print("| Best Score Menu                                                              |")
+    print("--------------------------------------------------------------------------------")
+    print("| File                      | Score       | Initial Solution | Algorithm       |")
+    print("| a_example                 | 000 000 000 | -                | -               |")
+    print("| b_read_on                 | 000 000 000 | -                | -               |")
+    print("| c_incunabula              | 000 000 000 | -                | -               |")
+    print("| d_tough_choices           | 000 000 000 | -                | -               |")
+    print("| e_so_many_books           | 000 000 000 | -                | -               |")
+    print("| f_libraries_of_the_world  | 000 000 000 | -                | -               |")
+    print("--------------------------------------------------------------------------------")
 
     choice = input("Press 0 to go back to main menu.\n")
     if choice == '0':
