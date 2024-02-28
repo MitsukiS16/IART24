@@ -31,46 +31,25 @@ Please be aware that if you have multiple versions of Python installed, you may 
 
 ## Algorithms
 
-Here's a summary of the categories and some of the algorithms listed under each:
+Initial Solutions:
 
-[ ] Swarm Intelligence Algorithms:
+- Random Solution
+- Trivial Solution
+- Greedy Constrution
 
-- [ ] Particle Swarm Optimization (PSO)
-- [ ] Ant Colony Optimization (ACO)
-- [ ] Bee Colony Optimization (BCO)
-- [ ] Firefly Algorithm (FA)
+Algorithms to implement:
 
-[ ] Simulated Annealing (SA) and its variants:
-
-- [ ] Quantum Annealing
-- [ ] Fast Simulated Annealing
-- [ ] Parallel Tempering
-
-[ ] Tabu Search (TS) and its variants:
-
-- [ ] Reactive Tabu Search
-- [ ] Guided Tabu Search
-- [ ] Iterated Tabu Search
-
-[ ] Local Search Algorithms:
-
-- [ ] Hill Climbing
-- [ ] Iterated Local Search (ILS)
-- [ ] Variable Neighborhood Search (VNS)
-
-[ ] Memetic Algorithms (MA):
-
-- [ ] Hybridization of genetic algorithms with local search methods
-
-[ ] Estimation of Distribution Algorithms (EDA):
-
-- [ ] Bayesian Optimization Algorithm (BOA)
-- [ ] Compact Genetic Algorithm (CGA)
-- [ ] Univariate Marginal Distribution Algorithm (UMDA)
-
-[ ] Hybrid Algorithms:
-
-- [ ] Combining multiple metaheuristics or metaheuristics with exact methods to leverage their complementary strengths
+- [Metaheuristic Methods] Genetic
+  [Metaheuristic Methods] Simulated Annealing
+- [Metaheuristic Methods] Particle Swarm Optimization
+- [Iterative Methods] Gradient Descent
+- [Iterative Methods] Newton's Method
+- [Iterative Methods] Conjugate Gradient Method
+- [Analytical Methods] Calculus-based Optimization
+- [Analytical Methods] Linear Programming
+- [Derivative-Free Optimization] Pattern Search
+- [Derivative-Free Optimization] Nelder-Mead Method
+- [Derivative-Free Optimization] Evolutionary Strategies
 
 ## Restricitions
 

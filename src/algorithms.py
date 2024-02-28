@@ -20,10 +20,6 @@
 # [Derivative-Free Optimization] Nelder-Mead Method
 # [Derivative-Free Optimization] Evolutionary Strategies
 
-# Escolher um algoritmos, criar o codigo e ver score :) simples :P
-
-
-
 
 ########################################
 # Imports 
