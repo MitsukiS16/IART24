@@ -1,5 +1,14 @@
+from library import Library
+
+
+# l = {}
+# scores = []
+# db = None
+# numLibs = None
+# sdays = None
+
 # Function to read data from input file
-def read_data(file_path):
+def read_data_file(file_path):
     libraries = {}
     scores = []
     diffbooks = None
@@ -30,4 +39,15 @@ def read_data(file_path):
             i += 1
             books = {}
 
-    return libraries, diffbooks, numLibs, shipping_days
+    return libraries, diffbooks, numLibs, shipping_days, scores
+
+
+# libraries, diffbooks, numlibs, shipping_days = read_data('/Users/valter/Documents/FEUP/2023_2024/2_semestre/3_ano/IA/proj/IART24/libraries/b_read_on.txt')
+
+# def prnt_libs_books():
+#     for key,value in libraries.items():
+#         print(f"Library : {key}, {value.number_books}")
+#         for bk, bv in value.books.items():
+#             print(f"{bk}, {bv}")
+
+# prnt_libs_books()

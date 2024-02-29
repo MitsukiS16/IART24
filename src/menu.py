@@ -3,9 +3,10 @@
 import sys
 import os
 
-from algorithms import algorithm1
-from algorithms import algorithm2
-from algorithms import algorithm3
+# from algorithms import algorithm1
+import algorithms
+# from algorithms import algorithm2
+# from algorithms import algorithm3
 
 
 # Exit Menu Function
@@ -43,7 +44,7 @@ def book_scanning_menu():
         inputalgorithm = input("Please enter your choice: ")
 
         options = {
-            '1': algorithm1,
+            '1': algorithms.algorithm1('/Users/valter/Documents/FEUP/2023_2024/2_semestre/3_ano/IA/proj/IART24/libraries/a_example.txt'),
             # '2': algorithm2,
             # '3': algorithm3,
             '0': menu
@@ -58,15 +59,15 @@ def book_scanning_menu():
                 menu()
             else:
                 print("Invalid choice. Please enter a valid option.")
-                best_score_menu()
+                #best_score_menu()
         else:
             print("Invalid choice. Please enter a valid option.")
-            best_scanning_menu()
+            #best_scanning_menu()
     elif inputfile == '0':
         menu()
     else:
         print("Invalid choice. Please enter a valid option.")
-        best_scanning_menu()
+        #best_scanning_menu()
 
 
 # Best Score Menu Function
@@ -123,3 +124,5 @@ def menu():
     else:
         print("Invalid choice. Please enter a valid option.")
         menu()
+
+menu()

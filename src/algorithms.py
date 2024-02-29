@@ -21,26 +21,57 @@
 ########################################
 # Imports 
 from library import Library
-from parser import read_data
+from pparser import read_data_file
 import numpy as np
 import copy
 
 ########################################
 # Global Variables
-libraries_shipped = set()
+# libraries_shipped = set()
 libraries = {}
 scores = []
+numLibs = None
 
+# libraries = {}
+# books = {}
+# libraries_shipped = set()
+# scores = []
+# libID = 0
+# islib = False
+# diffbooks = None
+# numLibs = None
+# shipping_days = None
 
 ########################################
 # Main and Auxiliar Functions for Optimization Algorithms
 
 # Algorithm 1
 def algorithm1(file):
+
+
+    libraries_shipped = set()
+
+    libs, diffbooks, nlibs, shipping_days, scs = read_data_file(file)
+
+    global libraries 
+    libraries = libs
+
+    global numLibs 
+    numLibs = nlibs
+
+    global scores
+    scores = scs
+
+    #print(scores)
+
+    #print(random_sign_up())
+    
     alg_name = "*name alg 1*"
-    solution = generate_solution()
+    print("hello")
+    solution , libs_shipped = generate_random_solution(shipping_days, numLibs, diffbooks, libraries_shipped)
     final_score = evaluate_solution(solution)
-    print_info(alg_name, file, final_score)
+    print(final_score)
+    #print_info(alg_name, file, final_score)
 
 
 # Helper function to print algorithm information
@@ -53,7 +84,8 @@ def print_info(alg_name, input_file):
 
 # Random sign up function
 def random_sign_up():
-    return np.random.randint(0, numLibs)
+    print(numLibs)
+    return np.random.randint(0, 2)
 
 
 # Function to get book scores
