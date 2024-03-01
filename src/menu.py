@@ -87,12 +87,12 @@ def book_scanning_menu():
                 best_score_menu()
         else:
             print("Invalid choice. Please enter a valid option.")
-            best_scanning_menu()
+            book_scanning_menu()
     elif inputfile == '0':
         menu()
     else:
         print("Invalid choice. Please enter a valid option.")
-        best_scanning_menu()
+        book_scanning_menu()
 
 
 

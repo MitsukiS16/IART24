@@ -22,7 +22,7 @@
 ########################################
 # Imports 
 from library import Library
-from parser import read_data
+from src.parser_1 import read_data
 import numpy as np
 import copy
 
