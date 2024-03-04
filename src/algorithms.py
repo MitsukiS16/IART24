@@ -23,6 +23,7 @@
 # Imports 
 from library import Library
 from pparser import read_data
+from pparser import write_data
 import evaluate_funcs as ef
 import neighbor_funcs as nf
 import mutation_funcs as mf
@@ -269,6 +270,8 @@ def get_sa_solution(file_path,init_solution):
         elif(np.exp(eval/temperature) >= np.random.rand()):
             best_solution = neighbor
             best_score = neighbor_score
+
+    write_data('../libraries/sa.txt', best_solution, libraries_shipped)
 
     return best_solution, best_score, scores
 
