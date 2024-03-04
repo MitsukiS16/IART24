@@ -25,6 +25,7 @@ from library import Library
 from pparser import read_data
 import evaluate_funcs as ef
 import neighbor_funcs as nf
+import mutation_funcs as mf
 import operators as op
 import numpy as np
 import copy
@@ -129,28 +130,78 @@ def print_info(alg_name,file_path,init_solution_name,score):
     print("-------------------------------------------------------------")
 
 ########################################
+    
+# Auxiliar funcs
+    
+def generate_population(population_size, shipping_days, numLibs, diffbooks, libraries_shipped, init_solution):
+    solutions = []
+    for i in range(population_size):
+        shipped_books_libraries, libs_shipped = init_solution(shipping_days, numLibs, diffbooks, libraries_shipped)
+        solutions.append(shipped_books_libraries)
+    return solutions
+
+
+
 # Algorithms
+    
 
 # Algorithm 3
-def algorithm3(file_path,id_init_sol,init_solution_name):
-    print("##################################")
-    print("You enter the algorithm3 Function")
-    print("##################################")
-
-    # Initialization of Variables
-    alg_name = "Algorithmo 3 :)"
-    score = 0
+def genetic_algorithm(file_path,init_solution):
     
-    # Read library
+    global libraries, books, scores, libraries_shipped
 
-    # Get Initial Solution
-
-    # Get Score
+    libraries, books, scores, diffbooks, numLibs, shipping_days = read_data(file_path)
 
 
-    # Return Information to Menu
-    print_info(alg_name,file_path,init_solution_name,score)
-    return 0
+    num_iterations = 20 
+    population_size = 10 
+    crossover_func = op.midpoint_crossover
+    mutation_func = mf.mutation_solution_exchange_book
+
+    
+    population = generate_population(population_size, shipping_days, numLibs, diffbooks, libraries_shipped, init_solution)
+
+    best_solution = population[0] # Initial solution
+    best_score = ef.evaluate_solution(population[0], scores)
+    best_solution_generation = 0 # Generation on which the best solution was found
+    
+    generation_no = 0
+
+    while(num_iterations > 0):
+        
+        generation_no += 1
+
+        total_fitness = 0
+
+        for individual in population:
+            total_fitness += ef.evaluate_solution(individual, scores)
+        
+        tournament_winner_sol = ef.tournament_select(population, 10, scores)
+        roulette_winner_sol = ef.roulette_select(population, total_fitness, scores)
+        
+        # Crossover
+        offspring = crossover_func(tournament_winner_sol, roulette_winner_sol)
+
+        # Mutation
+        mutated_offspring = [mutation_func(child, libraries_shipped, libraries) for child in offspring]
+
+        # Evaluate and integrate offspring into the population
+        # This step depends on your population management strategy
+        population = ef.replace_worst_individuals(population, mutated_offspring, scores)
+        
+        # Checking the greatest fit among the current population
+        greatest_fit = ef.get_greatest_fit(population, scores)
+        greatest_fit_score = ef.evaluate_solution(greatest_fit, scores)
+        if greatest_fit_score > best_score:
+            best_solution = greatest_fit
+            best_score = greatest_fit_score
+            best_solution_generation = generation_no
+        else:
+            num_iterations -= 1
+
+    print(best_solution_generation)
+   
+    return best_solution, best_score, scores
 
 
 

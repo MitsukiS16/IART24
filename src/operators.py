@@ -2,7 +2,6 @@ import math as m
 import numpy as np
 
 
-
 def random_sign_up(number_of_libs):
     return np.random.randint(0,number_of_libs)
 

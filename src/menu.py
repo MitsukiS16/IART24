@@ -60,8 +60,8 @@ def book_scanning_menu():
         print("-------------------------------------------------------------")
         print("| Please select the algorithm:                              |")
         print("| 1. Simulated Annealing                                    |")
-        print("| 2. Algorithm 2                                            |")
-        print("| 3. Algorithm 3                                            |")
+        print("| 2. Tabu Search                                            |")
+        print("| 3. Genetic Algorithm                                      |")
         print("| 0. Main Menu                                              |")
         print("-------------------------------------------------------------")
         inputalgorithm = input("Please enter your choice: ")
@@ -69,7 +69,7 @@ def book_scanning_menu():
         options = {
             '1': algo.get_sa_solution,
             '2': algo.tabu_search,
-            '3': algo.algorithm3,
+            '3': algo.genetic_algorithm,
             '0': menu
         }
 
