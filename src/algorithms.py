@@ -243,7 +243,7 @@ def get_sa_solution(file_path,init_solution):
     
     shipped_books_libraries, libraries_shipped = init_solution(shipping_days, numLibs, diffbooks, libraries_shipped)
 
-    num_iterations = 1000
+    num_iterations = 100
     iteration = 0
     temperature = 100
     cooling_rate = 0.999
