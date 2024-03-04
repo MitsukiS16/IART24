@@ -68,7 +68,7 @@ def book_scanning_menu():
 
         options = {
             '1': algo.get_sa_solution,
-            '2': algo.algorithm2,
+            '2': algo.tabu_search,
             '3': algo.algorithm3,
             '0': menu
         }

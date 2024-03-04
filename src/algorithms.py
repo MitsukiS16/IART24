@@ -155,25 +155,28 @@ def algorithm3(file_path,id_init_sol,init_solution_name):
 
 
 # Algorithm 2
-def algorithm2(file_path,id_init_sol,init_solution_name):
-    print("##################################")
-    print("You enter the algorithm2 Function")
-    print("##################################")
+def tabu_search(file_path,init_solution):   
 
-    # Initialization of Variables
-    alg_name = "Algorithmo 2 :)"
-    score = 0
+    global libraries, books, scores, libraries_shipped
+
+    libraries, books, scores, diffbooks, numLibs, shipping_days = read_data(file_path)
+
     
-    # Read library
+    shipped_books_libraries, libraries_shipped = init_solution(shipping_days, numLibs, diffbooks, libraries_shipped)
 
-    # Get Initial Solution
+    num_iterations = 100
 
-    # Get Score
-
-
-    # Return Information to Menu
-    print_info(alg_name,file_path,init_solution_name,score)
-    return 0
+    best_sol = list(shipped_books_libraries)
+    tabu_set = set()
+    while num_iterations > 0:
+        neighbor_sol = nf.neighbor_solution_exchange_book(best_sol, libraries_shipped, libraries)
+        if tuple(neighbor_sol) not in tabu_set:
+            tabu_set.add(tuple(neighbor_sol))
+            if ef.evaluate_solution(shipped_books_libraries, scores) < ef.evaluate_solution(neighbor_sol, scores):
+                best_sol = neighbor_sol
+        num_iterations -= 1
+    
+    return best_sol, ef.evaluate_solution(best_sol, scores), scores
 
 
 
@@ -189,9 +192,9 @@ def get_sa_solution(file_path,init_solution):
     
     shipped_books_libraries, libraries_shipped = init_solution(shipping_days, numLibs, diffbooks, libraries_shipped)
 
-    num_iterations = 100
+    num_iterations = 1000
     iteration = 0
-    temperature = 1000
+    temperature = 100
     cooling_rate = 0.999
 
     best_score = ef.evaluate_solution(shipped_books_libraries, scores)
