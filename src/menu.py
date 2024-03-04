@@ -3,9 +3,7 @@
 import sys
 import os
 
-from algorithms import algorithm1
-from algorithms import algorithm2
-from algorithms import algorithm3
+import algorithms as algo
 
 
 # Exit Menu Function
@@ -53,7 +51,7 @@ def book_scanning_menu():
         init_solution = input("Please enter your choice: ")
 
         sol_name = {
-        '1': "Random Solution",
+        '1': algo.generate_random_solution,
         '2': "Trivial Solution",
         '3': "Greedy Constrution",
         '0': "0"
@@ -61,7 +59,7 @@ def book_scanning_menu():
 
         print("-------------------------------------------------------------")
         print("| Please select the algorithm:                              |")
-        print("| 1. Algorithm 1                                            |")
+        print("| 1. Simulated Annealing                                    |")
         print("| 2. Algorithm 2                                            |")
         print("| 3. Algorithm 3                                            |")
         print("| 0. Main Menu                                              |")
@@ -69,16 +67,22 @@ def book_scanning_menu():
         inputalgorithm = input("Please enter your choice: ")
 
         options = {
-            '1': algorithm1,
-            '2': algorithm2,
-            '3': algorithm3,
+            '1': algo.get_sa_solution,
+            '2': algo.algorithm2,
+            '3': algo.algorithm3,
             '0': menu
         }
 
         selected_algorithm = options.get(inputalgorithm)
 
         if selected_algorithm:
-            selected_algorithm(file_paths[inputfile],init_solution,sol_name[init_solution])  # Pass the file path directly
+            best_solution , best_score, scores = selected_algorithm(file_paths[inputfile],sol_name[init_solution])  # Pass the file path directly
+            total = 0
+            for s in scores:
+                total += int(s)
+
+            print(total)
+            print(best_score)
             choice = input("Press 0 to go back to main menu.\n")
             if choice == '0':
                 menu()
