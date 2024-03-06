@@ -29,6 +29,7 @@ import neighbor_funcs as nf
 import mutation_funcs as mf
 import operators as op
 import numpy as np
+import random as rand
 import copy
 
 ########################################
@@ -50,52 +51,41 @@ shipping_days = None
 
 # Random initial solution
 
-def generate_random_solution(shipping_days, numLibs, diffbooks, libraries_shipped):
+def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info, libraries_shipped):
     visited_libs = set()
     canShip_libs = set()
     shipped_books = set()
     shipped_books_libraries = set()
-    randlibID = op.random_sign_up(numLibs)
-    visited_libs.add(randlibID)
-    canShip_libs.add(randlibID)
-    shipping_days -= libraries[randlibID].sign_up_time
+    shuffled_libraries = libraries_info.copy()
+    rand.shuffle(shuffled_libraries)
+    shuffled_libraries_aux = copy.copy(shuffled_libraries)
+    randlibID = shuffled_libraries_aux[0]
     randlibSignUp = 0
+   
     while shipping_days > 0:
-        if randlibSignUp == 0:
-            # print(f"visited libs LEN: {len(visited_libs)}")
-            # print(f"visited libs : {visited_libs}")
-            if len(visited_libs) < numLibs:
-                while True:
-                    randlibID = op.random_sign_up(numLibs)
-                    if randlibID not in visited_libs:
-                        visited_libs.add(randlibID)
-                        randlibSignUp = libraries[randlibID].sign_up_time
-                        break  
-            if randlibID not in canShip_libs:
-                canShip_libs.add(randlibID)
-        for libid in canShip_libs:
-            #print(f"shipped books: {shipped_books}")
-            sameDayShipping = libraries[libid].shipping_time
-            book_keys_list = list(libraries[libid].books.keys())
-            if not book_keys_list : continue
-            else: 
-                while sameDayShipping > 0:
-                    if(diffbooks == len(shipped_books)): 
-                        libraries_shipped = copy.deepcopy(visited_libs)
-                        return shipped_books_libraries, libraries_shipped
-                    else :
-                        random_key = np.random.choice(book_keys_list)
-                        if random_key not in shipped_books:
-                            shipped_books.add(random_key)
-                            shipped_books_libraries.add((random_key,libid))
-                            sameDayShipping -= 1
-                
-        
-        #print(f"shipping_days: {shipping_days}")
+
+        if len(shipped_books) == diffbooks: return shipped_books_libraries, libraries_shipped
+        elif randlibSignUp == 0 and len(shuffled_libraries_aux) > 0:
+            canShip_libs.add(randlibID)
+            visited_libs.add(randlibID)
+            shuffled_libraries_aux.pop(0)
+            if(len(shuffled_libraries_aux) > 0):
+                randlibID = shuffled_libraries_aux[0]
+                randlibSignUp = libraries[randlibID].sign_up_time
+        for libID in canShip_libs:
+            all_books = set(libraries[libID].books.keys())
+            available_books = list(all_books - shipped_books)
+            if(len(available_books) == 0): continue
+            daily_limit = libraries[libID].shipping_time
+            selected_books = np.random.choice(available_books, min(len(available_books), daily_limit), replace=False)
+            for book in selected_books:
+                shipped_books.add(book)
+                shipped_books_libraries.add((book, libID))
         randlibSignUp -= 1
         shipping_days -= 1
+   
 
-    libraries_shipped = copy.deepcopy(visited_libs)
+    libraries_shipped = visited_libs
     return shipped_books_libraries, libraries_shipped
         
         
@@ -214,7 +204,7 @@ def tabu_search(file_path,init_solution):
     libraries, books, scores, diffbooks, numLibs, shipping_days = read_data(file_path)
 
     
-    shipped_books_libraries, libraries_shipped = init_solution(shipping_days, numLibs, diffbooks, libraries_shipped)
+    shipped_books_libraries, libraries_shipped = init_solution(libraries, diffbooks, shipping_days)
 
     num_iterations = 100
 
@@ -239,40 +229,63 @@ def get_sa_solution(file_path,init_solution):
 
     global libraries, books, scores, libraries_shipped
 
-    libraries, books, scores, diffbooks, numLibs, shipping_days = read_data(file_path)
+    libraries, scores, diffbooks, shipping_days , libraries_info= read_data(file_path)
+
 
     
-    shipped_books_libraries, libraries_shipped = init_solution(shipping_days, numLibs, diffbooks, libraries_shipped)
+    shipped_books_libraries, libraries_shipped = init_solution(libraries, diffbooks, shipping_days, libraries_info, libraries_shipped)
 
-    num_iterations = 100
+
+    num_iterations = 1000
     iteration = 0
-    temperature = 100
+    temperature = 1000
+
     cooling_rate = 0.999
 
     best_score = ef.evaluate_solution(shipped_books_libraries, scores)
+
+    eval_scores = []
+
+    eval_scores.append(best_score)
     
-    best_solution = copy.deepcopy(shipped_books_libraries)
+    best_solution = list(shipped_books_libraries)
+
+
+    if(best_score == sum(int(s) for s in scores)): return best_solution, best_score, scores
 
     while iteration < num_iterations :
-        # Test with different cooling schedules
+
         temperature *= cooling_rate
         iteration += 1
         
-        neighbor = nf.neighbor_solution_exchange_book(list(best_solution), libraries_shipped, libraries)
+        #print(best_solution)
 
-        neighbor_score = ef.evaluate_solution(neighbor, scores)
-
+        neighbor_score = best_score
+        
+        neighbor , neighbor_score = nf.neighbor_solution_exchange_book(best_solution, libraries_shipped, libraries, neighbor_score)
+    
+       
         eval = neighbor_score - best_score
 
-        if eval > 0:
+
+        if eval >= 0:
             best_solution = neighbor
             best_score = neighbor_score
-        elif(np.exp(eval/temperature) >= np.random.rand()):
+        elif(np.exp(eval/temperature) >= np.random.uniform(0, 1 + np.finfo(float).eps)):
             best_solution = neighbor
             best_score = neighbor_score
+            
+            
+            iteration -= 1
+
+        eval_scores.append(best_score)
+
 
     write_data('../libraries/sa.txt', best_solution, libraries_shipped)
+    
 
-    return best_solution, best_score, scores
+    return best_solution, best_score, scores, eval_scores
+
+
 
 

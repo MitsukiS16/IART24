@@ -1,42 +1,38 @@
 import numpy as np
+import random as rand
+import evaluate_funcs as ef
 #exchange book 
 
-def neighbor_solution_exchange_book(solution, libraries_shipped, libraries):
+def neighbor_solution_exchange_book(solution, libraries_shipped, libraries, neighbor_score):
     
-    solution_list = list(solution)
+    neighbor_sol = solution.copy()
 
-    book = None
+    book = rand.choice(neighbor_sol)
 
-    size = 0
-    for sol in solution_list:
-        if(size == len(solution_list) - 1):
-            book = sol
-        else:
-            even_odd = np.random.randint(1,3)
-            if(even_odd % 2 == 0):
-                book = sol
-        size += 1
-
-    sol_len = len(solution)
-    #print(f"book to remove: {book}")
     library_id = book[1]
-    solution.remove(book)  
+    neighbor_sol.remove(book)
+   
+   
+    neighbor_score = ef.update_solution_score(neighbor_score, libraries[int(book[1])].books[int(book[0])], "dec")  
 
     if library_id in libraries_shipped:
+
         keys = list(libraries[library_id].books.keys())
-        if int(book[0]) in keys:
-            available_books = [b for b in keys if b != int(book[0]) and str(b) not in solution]
+        if book[0] in keys:
+            available_books = [b for b in keys if b != book[0] and b not in neighbor_sol]
             if available_books:
+
                 new_book = np.random.choice(available_books) 
-                #print(f"new book: {new_book}")
-                solution.append(str(new_book)) 
+                
+                neighbor_sol.append((new_book, library_id))
+                neighbor_score = ef.update_solution_score(neighbor_score, libraries[library_id].books[new_book], "inc")  
+            
     
-    if sol_len > len(solution):
-        solution.append(book)
-        
+    
+    
 
 
-    return solution
+    return neighbor_sol, neighbor_score
 
 
             

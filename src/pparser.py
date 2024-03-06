@@ -2,13 +2,14 @@ import library as l
 
 def read_data(file_path):
     i = 0
+    cnt = 0
     libraries = {}
     books = {}
     scores = []
+    libraries_info = []
     libID = 0
     islib = False
     diffbooks = None
-    numLibs = None
     shipping_days = None
 
     with open(file_path, 'r') as file:
@@ -24,9 +25,10 @@ def read_data(file_path):
             elif i > 0 and (len(arguments) > 3 or len(arguments) < 3):
                 
                 for arg in arguments:
-                    books[arg] = scores[int(arg)]
+                    books[int(arg)] = scores[int(arg)]
                     
                 libraries[libID].books = books
+                #libraries_info.append({ libID : (libID, libraries[libID].sign_up_time, libraries[libID].shipping_time, set(libraries[libID].books.keys())) })
             elif i > 0 and len(arguments) == 3 : 
                 if islib :
                     libID += 1
@@ -34,11 +36,13 @@ def read_data(file_path):
                 lib = l.Library(int(arguments[0]),int(arguments[1]),int(arguments[2]))
                 libraries[libID] = lib
                 islib = True
+                libraries_info.append(cnt)
+                cnt += 1
             i += 1
             books = {}
 
 
-    return libraries, books, scores, diffbooks, numLibs, shipping_days
+    return libraries, scores, diffbooks, shipping_days, libraries_info
 
 
 def write_data(file_path, shipped_books_libraries, shipped_libraries):
@@ -64,7 +68,7 @@ def write_data(file_path, shipped_books_libraries, shipped_libraries):
                 else:
                     for book in list_shipped_books_libraries:
                         if book[1] == list_shipped_libraries[0]:
-                            file.write(book[0])
+                            file.write(str(book[0]))
                             file.write(' ')
                     list_shipped_libraries.pop(0)
                     file.write('\n')
