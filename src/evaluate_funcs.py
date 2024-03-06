@@ -7,6 +7,13 @@ def evaluate_solution(solution, scores):
         score += int(scores[int(arg[0])])
     return score
 
+def update_solution_score(neighbor_score, book_score, op):
+    if op == "dec":
+        neighbor_score -= int(book_score)
+    elif op == "inc":
+        neighbor_score += int(book_score)
+    return neighbor_score
+
 def replace_worst_individuals(population, offspring, scores):
     
     sorted_population = sorted(population, key=lambda x : evaluate_solution(x, scores))
