@@ -208,14 +208,13 @@ def tabu_search(file_path,init_solution):
 
     best_score = ef.evaluate_solution(shipped_books_libraries, data.scores)
     best_sol = list(shipped_books_libraries)
-    tabu_set = set()
     for current_iter in range(num_iterations):
         neighbor_score = best_score
         neighbor_sol, neighbor_score = nf.neighbor_solution_exchange_book(best_sol, libraries_shipped, data.libraries, neighbor_score)
         str_neighbor = ','.join(map(str,neighbor_sol))
         hashed_neighbor = hashlib.md5(str_neighbor.encode()).hexdigest()
-        if hashed_neighbor not in tabu_set:
-            tabu_set.add((hashed_neighbor,current_iter))
+        if not any(hashed_neighbor == hash for hash, _ in tabu_deque):
+            tabu_deque.append((hashed_neighbor,current_iter))
             if best_score < neighbor_score:
                 best_sol = neighbor_sol
                 best_score = neighbor_score
