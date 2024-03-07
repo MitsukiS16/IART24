@@ -1,7 +1,7 @@
 import neighbor_funcs as nf
 
-def mutation_solution_exchange_book(solution, libraries_shipped, libraries):
-    return nf.neighbor_solution_exchange_book(solution, libraries_shipped, libraries)
+def mutation_solution_exchange_book(solution, libraries_shipped, libraries, neighbor_score):
+    return nf.neighbor_solution_exchange_book(solution, libraries_shipped, libraries, neighbor_score)
 
 
 def mutation_solution_exchange_two_books(solution, libraries_shipped):

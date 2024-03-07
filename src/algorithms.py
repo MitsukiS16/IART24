@@ -29,6 +29,7 @@ import neighbor_funcs as nf
 import mutation_funcs as mf
 import operators as op
 import numpy as np
+import math as m
 import random as rand
 import copy
 
@@ -118,11 +119,11 @@ def print_info(alg_name,file_path,init_solution_name,score):
     
 # Auxiliar funcs
     
-def generate_population(population_size, shipping_days, numLibs, diffbooks, libraries_shipped, init_solution):
+def generate_population(population_size, libraries, diffbooks, shipping_days, libraries_info, libraries_shipped, init_solution):
     solutions = []
     for i in range(population_size):
-        shipped_books_libraries, libs_shipped = init_solution(shipping_days, numLibs, diffbooks, libraries_shipped)
-        solutions.append(shipped_books_libraries)
+        shipped_books_libraries, libraries_shipped = init_solution(libraries, diffbooks, shipping_days, libraries_info, libraries_shipped)
+        solutions.append(list(shipped_books_libraries))
     return solutions
 
 
@@ -133,60 +134,87 @@ def generate_population(population_size, shipping_days, numLibs, diffbooks, libr
 # Algorithm 3
 def genetic_algorithm(file_path,init_solution):
     
-    global libraries, books, scores, libraries_shipped
+    libraries_shipped = set()
 
-    libraries, books, scores, diffbooks, numLibs, shipping_days = read_data(file_path)
+    data = DataContainer(*read_data(file_path))
+    
+    population_size = 10
+
+    population = generate_population(population_size , data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped, init_solution)
 
 
-    num_iterations = 20 
-    population_size = 10 
     crossover_func = op.midpoint_crossover
     mutation_func = mf.mutation_solution_exchange_book
-
-    
-    population = generate_population(population_size, shipping_days, numLibs, diffbooks, libraries_shipped, init_solution)
+    fit_func = ef.get_greatest_fit
 
     best_solution = population[0] # Initial solution
-    best_score = ef.evaluate_solution(population[0], scores)
+    best_score = 0
     best_solution_generation = 0 # Generation on which the best solution was found
-    
+    num_iterations = 1000
     generation_no = 0
 
+    eval_scores = []
+
     while(num_iterations > 0):
-        
+        population_fitness = sum(ef.evaluate_solution(individual, data.scores) for individual in population)
         generation_no += 1
-
-        total_fitness = 0
-
-        for individual in population:
-            total_fitness += ef.evaluate_solution(individual, scores)
+        new_population = []
+        visited_parents = set()
         
-        tournament_winner_sol = ef.tournament_select(population, 10, scores)
-        roulette_winner_sol = ef.roulette_select(population, total_fitness, scores)
-        
+        print(len(population))
+        for i in range(0, m.floor(len(population)/2)):
+                if(len(new_population) == population): break
+                #print("in")
+                total_fitness = sum(ef.evaluate_solution(individual, data.scores) for individual in population)
+                tournament_winner_sol = ef.tournament_select(population, 10, data.scores, visited_parents)
+                roulette_winner_sol = ef.roulette_select(population, total_fitness, data.scores, visited_parents)
+                #visited_parents.add(tuple(tournament_winner_sol))
+                #visited_parents.add(tuple(roulette_winner_sol))
+                offspring = crossover_func(tournament_winner_sol, roulette_winner_sol)           
+                for child in offspring:
+                    new_population.append(child)
+
         # Crossover
-        offspring = crossover_func(tournament_winner_sol, roulette_winner_sol)
 
-        # Mutation
-        mutated_offspring = [mutation_func(child, libraries_shipped, libraries) for child in offspring]
+        if(rand.random() <= 0.2):
+            # Mutation
+            results = [(mutation_func(child, libraries_shipped, data.libraries, ef.evaluate_solution(child, data.scores))) for child in new_population]
+            
+            mutated_offspring, mutated_scores = zip(*results)
 
-        # Evaluate and integrate offspring into the population
-        # This step depends on your population management strategy
-        population = ef.replace_worst_individuals(population, mutated_offspring, scores)
+            mutated_offspring = list(mutated_offspring)
+            mutated_scores = list(mutated_scores)
+
+            # Evaluate and integrate offspring into the population
+            # This step depends on your population management strategy
+            new_population = ef.replace_worst_individuals(new_population, mutated_offspring, data.scores)
         
         # Checking the greatest fit among the current population
-        greatest_fit = ef.get_greatest_fit(population, scores)
-        greatest_fit_score = ef.evaluate_solution(greatest_fit, scores)
-        if greatest_fit_score > best_score:
+        new_total_fitness = sum(ef.evaluate_solution(individual, data.scores) for individual in new_population)
+        
+        if new_total_fitness > population_fitness:
+            greatest_fit = fit_func(new_population, data.scores)
+           
             best_solution = greatest_fit
-            best_score = greatest_fit_score
+            #best_solution = greatest_fit
+            #best_score = greatest_fit_score
+            #best_solution_generation = generation_no
+            best_score = ef.evaluate_solution(greatest_fit, data.scores)
+            population = new_population
             best_solution_generation = generation_no
         else:
-            num_iterations -= 1
+            greatest_fit = fit_func(population, data.scores)
+           
+            best_solution = greatest_fit
+            best_score = ef.evaluate_solution(greatest_fit, data.scores)
 
-    print(best_solution_generation)
+        #print(num_iterations)
+        num_iterations -= 1
+        eval_scores.append(best_score)
+
+    #print(best_solution_generation)
    
-    return best_solution, best_score, scores
+    return  best_solution, libraries_shipped, eval_scores
 
 
 
