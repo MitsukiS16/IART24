@@ -21,8 +21,9 @@
 
 ########################################
 # Imports 
-from library import Library
 from pparser import read_data
+import hashlib
+import collections
 import evaluate_funcs as ef
 import neighbor_funcs as nf
 import mutation_funcs as mf
@@ -32,17 +33,9 @@ import random as rand
 import copy
 
 ########################################
-# Global Variables
-libraries_shipped = set()
-libraries = {}
-scores = []
-i = 0
-books = {}
-libID = 0
-islib = False
-diffbooks = None
-numLibs = None
-shipping_days = None
+#Global Variables
+
+DataContainer = collections.namedtuple('DataContainer', ['libraries', 'scores', 'diffbooks', 'shipping_days', 'libraries_info'])
 
 
 ########################################
@@ -200,26 +193,37 @@ def genetic_algorithm(file_path,init_solution):
 # Algorithm 2
 def tabu_search(file_path,init_solution):   
 
-    global libraries, books, scores, libraries_shipped
+    libraries_shipped = set()
 
-    libraries, books, scores, diffbooks, numLibs, shipping_days = read_data(file_path)
-
+    data = DataContainer(*read_data(file_path))
     
-    shipped_books_libraries, libraries_shipped = init_solution(libraries, diffbooks, shipping_days)
+    shipped_books_libraries, libraries_shipped = init_solution(data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped)
 
-    num_iterations = 100
+    num_iterations = 1000
+    tabu_tenure = 10
 
+    eval_scores = []
+
+    tabu_deque = collections.deque()
+
+    best_score = ef.evaluate_solution(shipped_books_libraries, data.scores)
     best_sol = list(shipped_books_libraries)
     tabu_set = set()
-    while num_iterations > 0:
-        neighbor_sol = nf.neighbor_solution_exchange_book(best_sol, libraries_shipped, libraries)
-        if tuple(neighbor_sol) not in tabu_set:
-            tabu_set.add(tuple(neighbor_sol))
-            if ef.evaluate_solution(shipped_books_libraries, scores) < ef.evaluate_solution(neighbor_sol, scores):
+    for current_iter in range(num_iterations):
+        neighbor_score = best_score
+        neighbor_sol, neighbor_score = nf.neighbor_solution_exchange_book(best_sol, libraries_shipped, data.libraries, neighbor_score)
+        str_neighbor = ','.join(map(str,neighbor_sol))
+        hashed_neighbor = hashlib.md5(str_neighbor.encode()).hexdigest()
+        if hashed_neighbor not in tabu_set:
+            tabu_set.add((hashed_neighbor,current_iter))
+            if best_score < neighbor_score:
                 best_sol = neighbor_sol
-        num_iterations -= 1
+                best_score = neighbor_score
+        while tabu_deque and current_iter - tabu_deque[0][1] > tabu_tenure:
+            tabu_deque.popleft()
+        eval_scores.append(best_score)
     
-    return best_sol, ef.evaluate_solution(best_sol, scores), scores
+    return best_sol, libraries_shipped, eval_scores
 
 
 
@@ -228,21 +232,20 @@ def tabu_search(file_path,init_solution):
 # Algorithm 1
 def get_sa_solution(file_path,init_solution):   
 
-    global libraries, books, scores, libraries_shipped
+    libraries_shipped = set()
 
-    libraries, scores, diffbooks, shipping_days , libraries_info= read_data(file_path)
-
+    data = DataContainer(*read_data(file_path))
     
-    shipped_books_libraries, libraries_shipped = init_solution(libraries, diffbooks, shipping_days, libraries_info, libraries_shipped)
+    shipped_books_libraries, libraries_shipped = init_solution(data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped)
 
 
-    num_iterations = 10
+    num_iterations = 1000
     iteration = 0
     temperature = 1000
 
-    cooling_rate = 0.999
+    cooling_rate = 0.9999
 
-    best_score = ef.evaluate_solution(shipped_books_libraries, scores)
+    best_score = ef.evaluate_solution(shipped_books_libraries, data.scores)
 
     eval_scores = []
 
@@ -251,7 +254,7 @@ def get_sa_solution(file_path,init_solution):
     best_solution = list(shipped_books_libraries)
 
 
-    if(best_score == sum(int(s) for s in scores)): return best_solution, libraries_shipped, eval_scores
+    if(best_score == sum(int(s) for s in data.scores)): return best_solution, libraries_shipped, eval_scores
 
     while iteration < num_iterations :
 
@@ -261,7 +264,7 @@ def get_sa_solution(file_path,init_solution):
 
         neighbor_score = best_score
         
-        neighbor , neighbor_score = nf.neighbor_solution_exchange_book(best_solution, libraries_shipped, libraries, neighbor_score)
+        neighbor , neighbor_score = nf.neighbor_solution_exchange_book(best_solution, libraries_shipped, data.libraries, neighbor_score)
     
         eval = neighbor_score - best_score
 
