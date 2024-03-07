@@ -23,7 +23,6 @@
 # Imports 
 from library import Library
 from pparser import read_data
-from pparser import write_data
 import evaluate_funcs as ef
 import neighbor_funcs as nf
 import mutation_funcs as mf
@@ -64,7 +63,9 @@ def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info
    
     while shipping_days > 0:
 
-        if len(shipped_books) == diffbooks: return shipped_books_libraries, libraries_shipped
+        if len(shipped_books) == diffbooks: 
+            libraries_shipped = visited_libs
+            return shipped_books_libraries, libraries_shipped
         elif randlibSignUp == 0 and len(shuffled_libraries_aux) > 0:
             canShip_libs.add(randlibID)
             visited_libs.add(randlibID)
@@ -231,12 +232,11 @@ def get_sa_solution(file_path,init_solution):
 
     libraries, scores, diffbooks, shipping_days , libraries_info= read_data(file_path)
 
-
     
     shipped_books_libraries, libraries_shipped = init_solution(libraries, diffbooks, shipping_days, libraries_info, libraries_shipped)
 
 
-    num_iterations = 1000
+    num_iterations = 10
     iteration = 0
     temperature = 1000
 
@@ -251,20 +251,18 @@ def get_sa_solution(file_path,init_solution):
     best_solution = list(shipped_books_libraries)
 
 
-    if(best_score == sum(int(s) for s in scores)): return best_solution, best_score, scores
+    if(best_score == sum(int(s) for s in scores)): return best_solution, libraries_shipped, eval_scores
 
     while iteration < num_iterations :
 
         temperature *= cooling_rate
         iteration += 1
         
-        #print(best_solution)
 
         neighbor_score = best_score
         
         neighbor , neighbor_score = nf.neighbor_solution_exchange_book(best_solution, libraries_shipped, libraries, neighbor_score)
     
-       
         eval = neighbor_score - best_score
 
 
@@ -281,10 +279,7 @@ def get_sa_solution(file_path,init_solution):
         eval_scores.append(best_score)
 
 
-    write_data('../libraries/sa.txt', best_solution, libraries_shipped)
-    
-
-    return best_solution, best_score, scores, eval_scores
+    return best_solution, libraries_shipped, eval_scores
 
 
 

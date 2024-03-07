@@ -47,6 +47,7 @@ def read_data(file_path):
 
 def write_data(file_path, shipped_books_libraries, shipped_libraries):
     i = 0
+    
     list_shipped_libraries = list(shipped_libraries)
     list_shipped_books_libraries = list(shipped_books_libraries)
     with open(file_path, 'w') as file:

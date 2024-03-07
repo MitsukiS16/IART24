@@ -3,9 +3,7 @@
 import sys
 import os
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
-from collections import Counter
-import numpy as np
+from pparser import write_data
 
 import algorithms as algo
 
@@ -83,14 +81,9 @@ def book_scanning_menu():
         selected_algorithm = options.get(inputalgorithm)
 
         if selected_algorithm:
-            best_solution , best_score, scores, eval_scores = selected_algorithm[0](file_paths[inputfile],sol_name[init_solution])  # Pass the file path directly
-            total = 0
-            for s in scores:
-                total += int(s)
-
-            print(total)
-            print(best_score)
-            choice = input("Select 0 for main menu or 1 to draw graph of 10 solutions.\n")
+            best_solution , libraries_shipped,  eval_scores = selected_algorithm[0](file_paths[inputfile],sol_name[init_solution])  # Pass the file path directly
+            write_data(f'../libraries/{selected_algorithm[1]}.txt', best_solution, libraries_shipped)
+            choice = input("Select 0 for main menu or 1 to draw graph showing the algorithm evolution.\n")
             if choice == '0':
                 menu()
             elif choice == '1':
