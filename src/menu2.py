@@ -7,23 +7,44 @@ import algorithms as algo
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import tkinter as tk
+from PIL import Image, ImageTk
 
 class BookScannerGUI(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Book Scanner Application")
-        self.geometry("400x400")
+        self.geometry("300x300")
+        self.load_background_image('background_image.png')
         self.create_main_menu()
+        #self.load_background_image('background_image.png')
+        self.after(100, self.lift_main_frame)
+
+    def load_background_image(self, image_path):
+        bg_image = Image.open(image_path).resize((600, 600), Image.Resampling.LANCZOS)
+        self.background_photo = ImageTk.PhotoImage(bg_image)
+
+        # Add the background image to a label
+        self.background_label = tk.Label(self, image=self.background_photo)
+        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
+        self.background_label.lower()  # Place the background label below other widgets in the same parent
+        self.background_label.image = self.background_photo  # Keep a reference
+
+    def lift_main_frame(self):
+        self.main_frame.lift()
 
     def create_main_menu(self):
         self.main_frame = ttk.Frame(self)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
 
         ttk.Label(self.main_frame, text="Welcome to our application", font=("Arial", 16)).pack(pady=20)
+        tk.Button(self.main_frame, text="Book Scanning", command=self.book_scanning_menu).pack(pady=10)
+        #book_scan_button.pack(side=tk.LEFT, padx=10)  # Adjust side and padding as needed
         
-        ttk.Button(self.main_frame, text="Book Scanning", command=self.book_scanning_menu).pack(pady=10)
         #ttk.Button(self.main_frame, text="See the best score for each library", command=self.best_score_menu).pack(pady=10)
-        ttk.Button(self.main_frame, text="Exit", command=self.exit_application).pack(pady=10)
+        tk.Button(self.main_frame, text="Exit", command=self.exit_application).pack(pady=10)
+
+        #exit_button.pack(side=tk.LEFT, padx=10)  # Adjust side and padding as needed
 
     def clear_frame(self, frame):
         for widget in frame.winfo_children():
@@ -85,7 +106,7 @@ class BookScannerGUI(tk.Tk):
         self.book_scanning_frame = ttk.Frame(self)
         self.book_scanning_frame.pack(fill=tk.BOTH, expand=True)
 
-    # Maps to link user selection to actual function
+        # Maps to link user selection to actual function
         algorithm_map = {
             "Simulated Annealing": (algo.get_sa_solution, "Simulated Annealing"),
             "Tabu Search": (algo.tabu_search, "Tabu Search"),
@@ -94,8 +115,8 @@ class BookScannerGUI(tk.Tk):
 
         initial_solution_map = {
             "Random Solution": algo.generate_random_solution, 
-            # "Trivial Solution": algo.trivial_solution,  # Example addition
-            # "Greedy Solution": algo.greedy_solution,   # Example addition
+            # "Trivial Solution": algo.trivial_solution, 
+            # "Greedy Solution": algo.greedy_solution,  
         }
 
         # Fetch the function based on user selection
@@ -116,16 +137,21 @@ class BookScannerGUI(tk.Tk):
 
                 # Display the result or further process it
         
-                ttk.Label(self.book_scanning_frame, text=f"best solution: {best_solution}", font=("Arial", 16)).pack(pady=20)
-                ttk.Label(self.book_scanning_frame, text=f"best_score: {best_score}", font=("Arial", 16)).pack(pady=20)
-                ttk.Label(self.book_scanning_frame, text=f"scores:{scores}", font=("Arial", 16)).pack(pady=20)
+                ttk.Label(self.book_scanning_frame, text=f"Best solution: {best_solution}", font=("Arial", 16)).pack(pady=20)
+                ttk.Label(self.book_scanning_frame, text=f"Best_score: {best_score}", font=("Arial", 16)).pack(pady=20)
+                ttk.Label(self.book_scanning_frame, text=f"Scores:{scores}", font=("Arial", 16)).pack(pady=20)
             except Exception as e:
                 ttk.Label(self.book_scanning_frame, text=f"Error: {str(e)}", font=("Arial", 16)).pack(pady=20)
         else:
             ttk.Label(self.book_scanning_frame, text="Invalid selection or error in execution", font=("Arial", 16)).pack(pady=20)
 
         ttk.Button(self.book_scanning_frame, text="Return to Main Menu", command=self.return_to_main_menu).pack(pady=10)
+        ttk.Button(self.book_scanning_frame, text="See Results", command=self.see_results).pack(pady=10)
         ttk.Button(self.book_scanning_frame, text="Exit", command=self.exit_application).pack(pady=10)
+
+    def see_results(self):
+        file = open("../libraries/sa.txt")
+        ttk.Label(self.book_scanning_frame, text=f"Results: {file}", font=("Arial", 16)).pack(pady=20)
 
     def return_to_main_menu(self):
         self.clear_frame(self.book_scanning_frame)
