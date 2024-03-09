@@ -1,7 +1,7 @@
 import numpy as np
 import random as rand
 import evaluate_funcs as ef
-#exchange book 
+import generators as gn
 
 def neighbor_solution_exchange_book(solution, libraries_shipped, libraries, neighbor_score):
     
@@ -35,110 +35,49 @@ def neighbor_solution_exchange_book(solution, libraries_shipped, libraries, neig
     return neighbor_sol, neighbor_score
 
 
-            
+def neighbor_exchange_libraries(libraries, shipping_days, shipped_libraries, shipped_books_libraries):
 
+    
+    shipped_library_efficiency = []
+    library_efficiency = []
+    remaining_shipping_days = shipping_days
+    for libID in shipped_libraries:
+        sign_up_time = libraries[libID].sign_up_time
+        shipping_time = libraries[libID].shipping_time
+        remaining_shipping_days -= sign_up_time
+        efficiency, days_left = ef.evaluate_library_efficiency(sign_up_time, remaining_shipping_days, shipping_time)
+        shipped_library_efficiency.append((libID, efficiency, days_left))
+    sorted_shipped_library_efficiency = sorted(shipped_library_efficiency, key=lambda x: x[1])
+        
+    lib_to_remove = sorted_shipped_library_efficiency[0][0]
+    lib_to_remove_days_left = sorted_shipped_library_efficiency[0][2]
+
+    library_keys = libraries.keys()
+
+    shipped_libraries.remove(lib_to_remove)
+    available_libraries = [libID for libID in library_keys if int(libID) not in shipped_libraries]
+
+    for libID in available_libraries:
+        sign_up_time = libraries[libID].sign_up_time
+        shipping_time = libraries[libID].shipping_time
+        efficiency, days_left = ef.evaluate_library_efficiency(sign_up_time, lib_to_remove_days_left, shipping_time)
+        library_efficiency.append((libID, efficiency))
+    sorted_library_efficiency = sorted(library_efficiency, key=lambda x: x[1])
+
+    shipped_libraries.add(sorted_library_efficiency[-1][0])
+
+    lib_to_add = sorted_library_efficiency[-1]
+    for lib in shipped_libraries:
+        if lib == lib_to_remove:
+            break
+
+    for book_lib in shipped_books_libraries:
+        if book_lib[1] == lib_to_remove:
+            shipped_books_libraries.remove(book_lib)
+
+            
+    shipped_books_libraries = gn.generate_determined_library_solution(libraries, shipped_books_libraries, lib_to_add)
+
+    return shipped_books_libraries, shipped_libraries
         
     
-    #exchange 2 books
-
-def neighbor_solution_exchange_two_books(solution, libraries_shipped):
-    solution_list = list(solution)
-
-    book1 = None
-    book2 = None
-
-    size = 0
-    for sol in solution_list:
-        if(size == len(solution_list) - 1):
-            book1 = solution_list[size - 1]
-            book2 = sol
-        else:
-            even_odd = np.random.randint(1,3)
-            if(even_odd % 2 == 0):
-                book1 = sol
-                book2 = solution_list[size + 1]
-        size += 1
-
-    sol_len = len(solution)
-
-    aux_libs = list()
-    aux_books = list()
-
-    aux_libs.append(book1[1])
-    aux_libs.append(book2[1])
-
-    aux_books.append(book1[0])
-    aux_books.append(book2[0])
-
-    solution.remove(book1)  
-    solution.remove(book2)
-
-    for book, library_id in aux_books, aux_libs:
-        if library_id in libraries_shipped:
-            keys = list(libraries[library_id].books.keys())
-            if int(book) in keys:
-                available_books = [b for b in keys if b != int(book) and str(b) not in solution]
-                if available_books:
-                    new_book = np.random.choice(available_books) 
-                    #print(f"new book: {new_book}")
-                    solution.add(str(new_book)) 
-    
-    # if sol_len > len(solution):
-    #     solution.add(book1)
-    #     solution.add(book2)
-    return solution
-
-
-
-def neighbor_solution_exchange_library_check(shipped_books, libraries_shipped):
-    randlibID_shipped = random_sign_up(len(libraries_shipped))
-
-    libraries_not_shipped = set()
-    for library_key in libraries.keys():
-        if library_key not in libraries_shipped:
-            libraries_not_shipped.add(library_key)
-
-    randlibID_not_shipped = random_sign_up(libraries_not_shipped)
-
-    i = 0 
-    for libID in libraries_shipped:
-        if(libID == randlibID_shipped):
-            libraries_shipped[i] = randlibID_not_shipped
-            break
-        i += 1
-
-    for book in shipped_books:
-        if(book[1]) == randlibID_shipped:
-            remove_book(shipped_books, book)
-            add_book(shipped_books, randlibID_not_shipped)
-            
-     
-    return shipped_books, libraries_shipped
-
-
-def neighbor_solution_exchange_library_no_check(shipped_books, libraries_shipped):
-    randlibID_shipped = random_sign_up(len(libraries_shipped))
-
-    libraries_not_shipped = set()
-    for library_key in libraries.keys():
-        if library_key not in libraries_shipped:
-            libraries_not_shipped.add(library_key)
-
-    randlibID_not_shipped = random_sign_up(libraries_not_shipped)
-
-    i = 0 
-    for libID in libraries_shipped:
-        if(libID == randlibID_shipped):
-            libraries_shipped[i] = randlibID_not_shipped
-            break
-        i += 1
-
-    for book in shipped_books:
-        if(book[1]) == randlibID_shipped:
-            remove_book(shipped_books, book)
-
-    for i in range(0,len(libraries[randlibID_shipped].books)):
-            add_book(shipped_books, randlibID_not_shipped)
-            
-     
-    return shipped_books, libraries_shipped

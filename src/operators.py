@@ -38,24 +38,6 @@ def randompoint_crossover(solution1, solution2):
     return chromosome1, chromosome2
 
 
-def add_book(shipped_books, libID):
-    size = len(libraries[libID].books)
-
-    visited_books = set()
-    while True:
-        random_book_id = np.random.randint(0,size)
-        random_book = libraries[libID].books[random_book_id]
-        if(random_book in shipped_books):
-            if(len(visited_books) == size): break 
-            visited_books.add(random_book_id)
-            continue
-        else:
-            shipped_books.add((random_book,libID)) 
-            break
-
-    return shipped_books
-
-
 def remove_book(shipped_books, book):
     if book in shipped_books:
         shipped_books.remove(book)

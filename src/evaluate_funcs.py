@@ -86,3 +86,6 @@ def roulette_select(total_fitness, old_scores_individuals):
         if cumulative_fitness >= spin_value:
             return list(individual)
     return list(last_individual)
+
+def evaluate_library_efficiency(sign_up_time, shipping_days, shipping_time):
+    return (shipping_days - sign_up_time) * shipping_time, shipping_days
