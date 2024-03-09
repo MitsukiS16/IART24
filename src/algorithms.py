@@ -29,11 +29,12 @@ import evaluate_funcs as ef
 import neighbor_funcs as nf
 import mutation_funcs as mf
 import generators as gn
+from generators import generate_random_solution
 import operators as op
 import numpy as np
 import math as m
 import random as rand
-import copy
+
 
 ########################################
 #Global Variables
@@ -43,49 +44,6 @@ DataContainer = collections.namedtuple('DataContainer', ['libraries', 'scores', 
 
 ########################################
 # Function to get the id of the initial solution
-
-# Random initial solution
-
-def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info, libraries_shipped):
-    visited_libs = set()
-    canShip_libs = set()
-    shipped_books = set()
-    shipped_books_libraries = set()
-    shuffled_libraries = libraries_info.copy()
-    rand.shuffle(shuffled_libraries)
-    shuffled_libraries_aux = copy.copy(shuffled_libraries)
-    randlibID = shuffled_libraries_aux[0]
-    randlibSignUp = 0
-   
-    while shipping_days > 0:
-
-        if len(shipped_books) == diffbooks: 
-            libraries_shipped = visited_libs
-            return shipped_books_libraries, libraries_shipped
-        elif randlibSignUp == 0 and len(shuffled_libraries_aux) > 0:
-            canShip_libs.add(randlibID)
-            visited_libs.add(randlibID)
-            shuffled_libraries_aux.pop(0)
-            if(len(shuffled_libraries_aux) > 0):
-                randlibID = shuffled_libraries_aux[0]
-                randlibSignUp = libraries[randlibID].sign_up_time
-        for libID in canShip_libs:
-            all_books = set(libraries[libID].books.keys())
-            available_books = list(all_books - shipped_books)
-            if(len(available_books) == 0): continue
-            daily_limit = libraries[libID].shipping_time
-            selected_books = np.random.choice(available_books, min(len(available_books), daily_limit), replace=False)
-            for book in selected_books:
-                shipped_books.add(book)
-                shipped_books_libraries.add((book, libID))
-        randlibSignUp -= 1
-        shipping_days -= 1
-   
-
-    libraries_shipped = visited_libs
-    return shipped_books_libraries, libraries_shipped
-        
-        
 
 # Trivial initial solution
 def get_trivial_solution():
@@ -204,7 +162,7 @@ def genetic_algorithm(file_path,init_solution):
     for sol in best_solution:
         if sol[1] not in libraries_shipped:
             libraries_shipped.add(sol[1])
-            
+
     return  best_solution, libraries_shipped, eval_scores
 
 
@@ -261,7 +219,7 @@ def get_sa_solution(file_path,init_solution):
     iteration = 0
     temperature = 1000
 
-    cooling_rate = 0.9999
+    cooling_rate = 0.999
 
     best_score = ef.evaluate_solution(shipped_books_libraries, data.scores)
 
@@ -283,9 +241,12 @@ def get_sa_solution(file_path,init_solution):
         neighbor_score = best_score
         
         neighbor , neighbor_score = nf.neighbor_solution_exchange_book(best_solution, libraries_shipped, data.libraries, neighbor_score)
-    
-        eval = neighbor_score - best_score
+        
+        #neighbor , libraries_shipped = nf.neighbor_exchange_libraries(data.libraries, data.shipping_days, libraries_shipped, best_solution)
+        #neighbor_score = ef.evaluate_solution(neighbor,data.scores)
 
+
+        eval = neighbor_score - best_score
 
         if eval >= 0:
             best_solution = neighbor
@@ -298,7 +259,6 @@ def get_sa_solution(file_path,init_solution):
             iteration -= 1
 
         eval_scores.append(best_score)
-
 
     return best_solution, libraries_shipped, eval_scores
 
