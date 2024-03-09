@@ -21,12 +21,14 @@
 
 ########################################
 # Imports 
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from pparser import read_data
 import hashlib
 import collections
 import evaluate_funcs as ef
 import neighbor_funcs as nf
 import mutation_funcs as mf
+import generators as gn
 import operators as op
 import numpy as np
 import math as m
@@ -116,20 +118,6 @@ def print_info(alg_name,file_path,init_solution_name,score):
     print("-------------------------------------------------------------")
 
 ########################################
-    
-# Auxiliar funcs
-    
-def generate_population(population_size, libraries, diffbooks, shipping_days, libraries_info, libraries_shipped, init_solution):
-    solutions = []
-    for i in range(population_size):
-        shipped_books_libraries, libraries_shipped = init_solution(libraries, diffbooks, shipping_days, libraries_info, libraries_shipped)
-        solutions.append(list(shipped_books_libraries))
-    return solutions
-
-
-
-# Algorithms
-    
 
 # Algorithm 3
 def genetic_algorithm(file_path,init_solution):
@@ -138,81 +126,81 @@ def genetic_algorithm(file_path,init_solution):
 
     data = DataContainer(*read_data(file_path))
     
-    population_size = 10
+    population_size = 100
 
-    population = generate_population(population_size , data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped, init_solution)
-
-
+    population = gn.generate_population_parallel(population_size , data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped, init_solution)
+    population_len = len(population)
+    population_fitness = None
+    
     crossover_func = op.midpoint_crossover
     mutation_func = mf.mutation_solution_exchange_book
-    fit_func = ef.get_greatest_fit
 
-    best_solution = population[0] # Initial solution
-    best_score = 0
-    best_solution_generation = 0 # Generation on which the best solution was found
-    num_iterations = 1000
+    best_solution = None
+    best_score = None
+    best_solution_generation = 0 
+    num_iterations = 10
     generation_no = 0
 
     eval_scores = []
+    population_fitness, old_best_score, old_best_solution , old_individuals_scores = ef.evaluate_population(population, data.scores)
+    best_score = old_best_score
+    best_solution = old_best_solution 
 
     while(num_iterations > 0):
-        population_fitness = sum(ef.evaluate_solution(individual, data.scores) for individual in population)
+
+        
         generation_no += 1
         new_population = []
-        visited_parents = set()
-        
-        print(len(population))
-        for i in range(0, m.floor(len(population)/2)):
-                if(len(new_population) == population): break
-                #print("in")
-                total_fitness = sum(ef.evaluate_solution(individual, data.scores) for individual in population)
-                tournament_winner_sol = ef.tournament_select(population, 10, data.scores, visited_parents)
-                roulette_winner_sol = ef.roulette_select(population, total_fitness, data.scores, visited_parents)
-                #visited_parents.add(tuple(tournament_winner_sol))
-                #visited_parents.add(tuple(roulette_winner_sol))
-                offspring = crossover_func(tournament_winner_sol, roulette_winner_sol)           
-                for child in offspring:
-                    new_population.append(child)
 
-        # Crossover
+        num_offspring = m.floor((population_len - len(new_population))/2)
 
-        if(rand.random() <= 0.2):
-            # Mutation
-            results = [(mutation_func(child, libraries_shipped, data.libraries, ef.evaluate_solution(child, data.scores))) for child in new_population]
+        with ProcessPoolExecutor() as executor:
+            parent_pairs = [(ef.tournament_select(population, 5, data.scores),
+                            ef.roulette_select(population_fitness, old_individuals_scores))
+                            for _ in range(num_offspring)]
             
-            mutated_offspring, mutated_scores = zip(*results)
+            parent_crossover_pairs = [((parent1, parent2), crossover_func) for parent1, parent2 in parent_pairs]
 
-            mutated_offspring = list(mutated_offspring)
-            mutated_scores = list(mutated_scores)
-
-            # Evaluate and integrate offspring into the population
-            # This step depends on your population management strategy
-            new_population = ef.replace_worst_individuals(new_population, mutated_offspring, data.scores)
+            offspring_results = executor.map(gn.generate_offspring_wrapper, parent_crossover_pairs)
+            
+            for offspring in offspring_results:
+                new_population.extend(offspring)
         
-        # Checking the greatest fit among the current population
-        new_total_fitness = sum(ef.evaluate_solution(individual, data.scores) for individual in new_population)
+        new_population = ef.hybrid_elitism(population_len, new_population, old_individuals_scores,  0.2)
+
+        mutated_offspring = []
+        mutation_probability = 0.2
+
+        with ThreadPoolExecutor() as executor:
+            futures = [executor.submit(gn.mutate, list(child), libraries_shipped, data.libraries, mutation_func) for child in new_population if rand.random() <= mutation_probability]
+            
+            for future in as_completed(futures):
+                mutated_child = future.result()
+                mutated_offspring.append(mutated_child)
+                
+        for child in new_population:
+            if child not in mutated_offspring:
+                mutated_offspring.append(child)
+                
+        
+       
+        new_total_fitness, new_best_fitness, new_best_solution , new_individual_scores = ef.evaluate_population(mutated_offspring, data.scores)
         
         if new_total_fitness > population_fitness:
-            greatest_fit = fit_func(new_population, data.scores)
-           
-            best_solution = greatest_fit
-            #best_solution = greatest_fit
-            #best_score = greatest_fit_score
-            #best_solution_generation = generation_no
-            best_score = ef.evaluate_solution(greatest_fit, data.scores)
+            best_solution = new_best_solution
+            best_score = new_best_fitness
             population = new_population
+            population_fitness = new_total_fitness
+            old_best_score = new_best_fitness
+            old_best_solution = new_best_solution
+            old_individuals_scores = new_individual_scores
             best_solution_generation = generation_no
+            eval_scores.append(new_total_fitness)
         else:
-            greatest_fit = fit_func(population, data.scores)
-           
-            best_solution = greatest_fit
-            best_score = ef.evaluate_solution(greatest_fit, data.scores)
+            eval_scores.append(population_fitness)
 
-        #print(num_iterations)
         num_iterations -= 1
-        eval_scores.append(best_score)
 
-    #print(best_solution_generation)
    
     return  best_solution, libraries_shipped, eval_scores
 

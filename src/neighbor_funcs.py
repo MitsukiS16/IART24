@@ -8,7 +8,7 @@ def neighbor_solution_exchange_book(solution, libraries_shipped, libraries, neig
     neighbor_sol = solution.copy()
 
     book = rand.choice(neighbor_sol)
-
+    
     library_id = book[1]
     neighbor_sol.remove(book)
    
