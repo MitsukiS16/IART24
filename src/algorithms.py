@@ -185,7 +185,7 @@ def genetic_algorithm(file_path,init_solution):
         
        
         new_total_fitness, new_best_fitness, new_best_solution , new_individual_scores = ef.evaluate_population(mutated_offspring, data.scores)
-        
+
         if new_total_fitness > population_fitness:
             best_solution = new_best_solution
             best_score = new_best_fitness
@@ -201,7 +201,10 @@ def genetic_algorithm(file_path,init_solution):
 
         num_iterations -= 1
 
-   
+    for sol in best_solution:
+        if sol[1] not in libraries_shipped:
+            libraries_shipped.add(sol[1])
+            
     return  best_solution, libraries_shipped, eval_scores
 
 
