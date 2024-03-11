@@ -263,5 +263,29 @@ def get_sa_solution(file_path,init_solution):
     return best_solution, libraries_shipped, eval_scores
 
 
+def hill_climbing_algorithm(file_path, init_solution):
 
+    libraries_shipped = set()
+
+    data = DataContainer(*read_data(file_path))
+
+    shipped_books_libraries, libraries_shipped = init_solution(data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped)
+
+    best_score = ef.evaluate_solution(shipped_books_libraries, data.scores)
+    best_sol = list(shipped_books_libraries)
+    
+    improved = True
+    while improved:
+        improved = False
+        neighbor_sol, potential_new_score = nf.neighbor_solution_exchange_book(best_sol, libraries_shipped, data.libraries, best_score)
+
+        neighbor_score = ef.evaluate_solution(neighbor_sol, data.scores)
+
+        # If the neighbor solution is better, update the best solution
+        if neighbor_score > best_score:
+            best_sol = neighbor_sol
+            best_score = neighbor_score
+            improved = True
+
+    return best_sol, libraries_shipped, best_score
 

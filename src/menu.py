@@ -61,12 +61,14 @@ def book_scanning_menu():
         sa = "Simulated Annealing"
         ts = "Tabu Search"
         ga = "Genetic Algorithm"
+        hc = "Hill Climbing Algorithm"
 
         print("-------------------------------------------------------------")
         print("| Please select the algorithm:                              |")
         print("| 1. Simulated Annealing                                    |")
         print("| 2. Tabu Search                                            |")
         print("| 3. Genetic Algorithm                                      |")
+        print("| 4. Hill Climbing Algorithm                                |")
         print("| 0. Main Menu                                              |")
         print("-------------------------------------------------------------")
         inputalgorithm = input("Please enter your choice: ")
@@ -75,6 +77,7 @@ def book_scanning_menu():
             '1': (algo.get_sa_solution, sa),
             '2': (algo.tabu_search, ts),
             '3': (algo.genetic_algorithm, ga),
+            '4': (algo.hill_climbing_algorithm, hc),
             '0': menu
         }
 
