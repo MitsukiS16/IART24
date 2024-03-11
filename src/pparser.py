@@ -1,7 +1,6 @@
 from library import Library
 from tabulate import tabulate
 
-
 def read_data(file_path):
     libraries = {}
     num_libs = None
@@ -20,16 +19,14 @@ def read_data(file_path):
             current_line += 1
             book_ids = list(map(int, lines[current_line].split()))
             current_line += 1
-            library_books = [(book_id, scores[book_id]) for book_id in book_ids]
+            library_books = {book_id: scores[book_id] for book_id in book_ids}  # Use dictionary instead of list of tuples
             libraries[i] = Library(num_books_in_lib, signup_days, shipping_rate)
-            libraries[i].books = library_books  
+            libraries[i].books = library_books
             diffbooks.update(book_ids)
             libraries_info.append(i) 
             
     libraries_info = list(libraries.keys())
     return libraries, scores, diffbooks, shipping_days, libraries_info
-
-
 
 
 def write_data(file_path, shipped_books_libraries, shipped_libraries):
@@ -80,11 +77,11 @@ def test_read_func(libraries, scores, diffbooks, shipping_days, libraries_info):
 
 
 # file_path = "../input/a_example.txt"
-file_path = "../input/b_read_on.txt"
+# file_path = "../input/b_read_on.txt"
 # file_path = "../input/a_example.txt"
 # file_path = "../input/a_example.txt"
 # file_path = "../input/a_example.txt"
 # file_path = "../input/a_example.txt"
 
-libraries, scores, diffbooks, shipping_days, libraries_info = read_data(file_path)
-test_read_func(libraries, scores, diffbooks, shipping_days, libraries_info)
+# libraries, scores, diffbooks, shipping_days, libraries_info = read_data(file_path)
+# test_read_func(libraries, scores, diffbooks, shipping_days, libraries_info)
