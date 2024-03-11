@@ -1,25 +1,3 @@
-########################################
-### Initial Solutions
-# Random Solution
-# Trivial Solution
-# Greedy Constrution
-
-### Algorithms to implement
-# [Metaheuristic Methods] Genetic [Anotations on PP3]
-# [Metaheuristic Methods] Simulated Annealing [Anotations on PP3]
-# [Metaheuristic Methods] Tabu Search [Anotations on PP3]
-# [Metaheuristic Methods] Guided Local Search [Anotations on PP3]
-# [Metaheuristic Methods] Particle Swarm Optimization
-# [Iterative Methods] Gradient Descent
-# [Iterative Methods] Newton's Method
-# [Iterative Methods] Conjugate Gradient Method
-# [Analytical Methods] Calculus-based Optimization
-# [Analytical Methods] Linear Programming
-# [Derivative-Free Optimization] Pattern Search
-# [Derivative-Free Optimization] Nelder-Mead Method
-# [Derivative-Free Optimization] Evolutionary Strategies
-
-########################################
 # Imports 
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from pparser import read_data
@@ -41,43 +19,9 @@ import random as rand
 
 DataContainer = collections.namedtuple('DataContainer', ['libraries', 'scores', 'diffbooks', 'shipping_days', 'libraries_info'])
 
-
-########################################
-# Function to get the id of the initial solution
-
-# Trivial initial solution
-def get_trivial_solution():
-    print("##################################")
-    print("You enter the get_trivial_solution Function")
-    print("##################################")
-
-    #TO DO 
-
-    return 0
-
-# Gready initial solution
-def get_greedy_solution():
-    print("##################################")
-    print("You enter the get_greedy_solution Function")
-    print("##################################")
-
-    #TO DO 
-
-    return 0
-
-########################################
-# Helper function to print algorithm information
-def print_info(alg_name,file_path,init_solution_name,score):
-    print("-------------------------------------------------------------")
-    print(f"| Algorithm: {alg_name}")
-    print(f"| File: {file_path}")
-    print(f"| Initial Solution: {init_solution_name}")
-    print(f"| The final score was: {score}")
-    print("-------------------------------------------------------------")
-
 ########################################
 
-# Algorithm 3
+# Genetic Algorithm
 def genetic_algorithm(file_path,init_solution):
     
     libraries_shipped = set()
@@ -165,9 +109,7 @@ def genetic_algorithm(file_path,init_solution):
 
     return  best_solution, libraries_shipped, eval_scores
 
-
-
-# Algorithm 2
+# Tabu Search
 def tabu_search(file_path,init_solution):   
 
     libraries_shipped = set()
@@ -201,11 +143,7 @@ def tabu_search(file_path,init_solution):
     
     return best_sol, libraries_shipped, eval_scores
 
-
-
-
-
-# Algorithm 1
+# Simulated Annealing Algorithm
 def get_sa_solution(file_path,init_solution):   
 
     libraries_shipped = set()
@@ -262,7 +200,7 @@ def get_sa_solution(file_path,init_solution):
 
     return best_solution, libraries_shipped, eval_scores
 
-
+# Hill Climbing Algorithm
 def hill_climbing_algorithm(file_path, init_solution):
 
     libraries_shipped = set()
