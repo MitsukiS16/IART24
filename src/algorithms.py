@@ -23,37 +23,27 @@ DataContainer = collections.namedtuple('DataContainer', ['libraries', 'scores', 
 
 # Genetic Algorithm
 def genetic_algorithm(file_path,init_solution):
-    
     libraries_shipped = set()
-
     data = DataContainer(*read_data(file_path))
-    
     population_size = 100
-
     population = gn.generate_population_parallel(population_size , data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped, init_solution)
     population_len = len(population)
     population_fitness = None
-    
     crossover_func = op.midpoint_crossover
     mutation_func = mf.mutation_solution_exchange_book
-
     best_solution = None
     best_score = None
     best_solution_generation = 0 
     num_iterations = 10
     generation_no = 0
-
     eval_scores = []
     population_fitness, old_best_score, old_best_solution , old_individuals_scores = ef.evaluate_population(population, data.scores)
     best_score = old_best_score
     best_solution = old_best_solution 
 
     while(num_iterations > 0):
-
-        
         generation_no += 1
         new_population = []
-
         num_offspring = m.floor((population_len - len(new_population))/2)
 
         with ProcessPoolExecutor() as executor:
@@ -62,20 +52,17 @@ def genetic_algorithm(file_path,init_solution):
                             for _ in range(num_offspring)]
             
             parent_crossover_pairs = [((parent1, parent2), crossover_func) for parent1, parent2 in parent_pairs]
-
             offspring_results = executor.map(gn.generate_offspring_wrapper, parent_crossover_pairs)
             
             for offspring in offspring_results:
                 new_population.extend(offspring)
         
         new_population = ef.hybrid_elitism(population_len, new_population, old_individuals_scores,  0.2)
-
         mutated_offspring = []
         mutation_probability = 0.2
 
         with ThreadPoolExecutor() as executor:
             futures = [executor.submit(gn.mutate, list(child), libraries_shipped, data.libraries, mutation_func) for child in new_population if rand.random() <= mutation_probability]
-            
             for future in as_completed(futures):
                 mutated_child = future.result()
                 mutated_offspring.append(mutated_child)
@@ -83,9 +70,7 @@ def genetic_algorithm(file_path,init_solution):
         for child in new_population:
             if child not in mutated_offspring:
                 mutated_offspring.append(child)
-                
-        
-       
+
         new_total_fitness, new_best_fitness, new_best_solution , new_individual_scores = ef.evaluate_population(mutated_offspring, data.scores)
 
         if new_total_fitness > population_fitness:

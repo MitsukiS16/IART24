@@ -6,7 +6,6 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 def evaluate_population(population, scores):
     individual_to_future = {}
-    
     total_fitness = 0
     best_score = 0
     best_solution = None
@@ -15,7 +14,6 @@ def evaluate_population(population, scores):
             individual_key = tuple(individual)
             future = executor.submit(evaluate_solution, individual, scores)
             individual_to_future[individual_key] = future
-
         for future in as_completed(individual_to_future.values()):  
             individual = {v: k for k, v in individual_to_future.items()}[future]
             try:

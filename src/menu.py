@@ -34,7 +34,6 @@ OUTPUT_FILES = {
 INITIAL_SOLUTIONS = {
     '1': generate_random_solution,
     '2': "trivial_population",
-    '3': "greedy_population"
     # add more
 }
 
