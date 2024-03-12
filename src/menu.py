@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from pparser import write_data
 from tabulate import tabulate
 
-import algorithms as algo
+from algorithms import generate_random_solution
 from algorithms import genetic_algorithm, tabu_search, get_sa_solution, hill_climbing_algorithm
 
 ########################################
@@ -32,7 +32,7 @@ OUTPUT_FILES = {
 }
 
 INITIAL_SOLUTIONS = {
-    '1': algo.generate_random_solution,
+    '1': generate_random_solution,
     '2': "trivial_population",
     '3': "greedy_population"
     # add more
@@ -44,10 +44,10 @@ ga = "Genetic Algorithm"
 hc = "Hill Climbing Algorithm"
 
 ALGORITHMS =  {
-    '1': (algo.get_sa_solution, sa),
-    '2': (algo.tabu_search, ts),
-    '3': (algo.genetic_algorithm, ga),
-    '4': (algo.hill_climbing_algorithm, hc)
+    '1': (get_sa_solution, sa),
+    '2': (tabu_search, ts),
+    '3': (genetic_algorithm, ga),
+    '4': (hill_climbing_algorithm, hc)
     # add more
 }
 
@@ -150,11 +150,8 @@ def book_scanning_menu():
     print_info(selected_algorithm, input_file, init_solution, eval_scores, elapsed_time)
 
     choice = input("Press 1 for showing the graph of the algorithm; Press 0 for main menu.\n")
-    if choice == '0':
-        menu()
-    else:
+    if choice == '1':
         draw_graph(eval_scores)
-        input("Press Enter to continue...")
     menu()
 
 
@@ -177,7 +174,7 @@ def get_content_best_score():
         lines = f.readlines()
 
     # Initialize table headers and rows
-    headers = ['File', 'Initial Solution', 'Algorithm', 'Score', 'Time']
+    headers = ['File', 'Initial Solution', 'Algorithm', 'Score', 'Time (sec)']
     rows = []
 
     # Skip the first line (header)

@@ -1,0 +1,7 @@
+File, Initial Solution, Algorithm, Score, Time
+a_example, random_solution , get_sa_solution, 21 , 0.0007
+b_read_on, random_solution , get_sa_solution, 4338700 , 544
+c_incunabula, random_solution , get_sa_solution , 846959, 0 , 17
+d_tough_choices, null , null, 0 , 0
+e_so_many_books, null , null, 0 , 0
+f_libraries_of_the_world, null , null, 0 , 0
