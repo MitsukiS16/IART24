@@ -24,9 +24,11 @@ def neighbor_solution_exchange_book(solution, libraries_shipped, libraries, neig
 
                 new_book = np.random.choice(available_books) 
                 
+                
                 neighbor_sol.append((new_book, library_id))
+                
                 neighbor_score = ef.update_solution_score(neighbor_score, libraries[library_id].books[new_book], "inc")  
-            
+                
     
     
     
@@ -41,20 +43,21 @@ def neighbor_exchange_libraries(libraries, shipping_days, shipped_libraries, shi
     shipped_library_efficiency = []
     library_efficiency = []
     remaining_shipping_days = shipping_days
+
     for libID in shipped_libraries:
         sign_up_time = libraries[libID].sign_up_time
         shipping_time = libraries[libID].shipping_time
-        remaining_shipping_days -= sign_up_time
         efficiency, days_left = ef.evaluate_library_efficiency(sign_up_time, remaining_shipping_days, shipping_time)
+        remaining_shipping_days -= sign_up_time
         shipped_library_efficiency.append((libID, efficiency, days_left))
     sorted_shipped_library_efficiency = sorted(shipped_library_efficiency, key=lambda x: x[1])
+
         
     lib_to_remove = sorted_shipped_library_efficiency[0][0]
     lib_to_remove_days_left = sorted_shipped_library_efficiency[0][2]
 
     library_keys = libraries.keys()
 
-    shipped_libraries.remove(lib_to_remove)
     available_libraries = [libID for libID in library_keys if int(libID) not in shipped_libraries]
 
     for libID in available_libraries:
@@ -64,19 +67,24 @@ def neighbor_exchange_libraries(libraries, shipping_days, shipped_libraries, shi
         library_efficiency.append((libID, efficiency))
     sorted_library_efficiency = sorted(library_efficiency, key=lambda x: x[1])
 
-    shipped_libraries.add(sorted_library_efficiency[-1][0])
+    if(sorted_library_efficiency[-1][1] <= 0): return shipped_books_libraries, shipped_libraries
+    elif(sorted_library_efficiency[-1][1] < sorted_shipped_library_efficiency[0][1]): return shipped_books_libraries, shipped_libraries
 
-    lib_to_add = sorted_library_efficiency[-1]
-    for lib in shipped_libraries:
-        if lib == lib_to_remove:
-            break
+    best_library , best_books = ef.evaluate_library_book_efficiency(libraries, sorted_library_efficiency, shipped_books_libraries)
+    
+    shipped_libraries.remove(lib_to_remove)
 
+    shipped_libraries.append(best_library[0])
+
+    lib_to_add = best_library
+    
     for book_lib in shipped_books_libraries:
         if book_lib[1] == lib_to_remove:
+           
             shipped_books_libraries.remove(book_lib)
 
             
-    shipped_books_libraries = gn.generate_determined_library_solution(libraries, shipped_books_libraries, lib_to_add)
+    shipped_books_libraries = gn.generate_determined_library_solution(shipped_books_libraries, lib_to_add, best_books)
 
     return shipped_books_libraries, shipped_libraries
         

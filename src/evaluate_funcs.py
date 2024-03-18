@@ -87,3 +87,25 @@ def roulette_select(total_fitness, old_scores_individuals):
 
 def evaluate_library_efficiency(sign_up_time, shipping_days, shipping_time):
     return (shipping_days - sign_up_time) * shipping_time, shipping_days
+
+def evaluate_library_book_efficiency(libraries, available_libraries, shipped_books):
+
+    best_library = None
+    len_avail_books = m.inf
+    best_books = []
+
+    for library in reversed(available_libraries):
+        available_books = evaluate_available_books(library, libraries, shipped_books)
+        if(library[1] - len(available_books) < len_avail_books):
+            len_avail_books = library[1] - len(available_books)
+            best_library = library
+            best_books = available_books
+
+    
+    return best_library, best_books
+
+def evaluate_available_books(lib, libraries, shipped_books):
+
+    available_books = [(int(key), int(value)) for key, value in libraries[lib[0]].books.items() if int(key) not in shipped_books]
+
+    return available_books

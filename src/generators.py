@@ -42,7 +42,7 @@ def mutate(child, libraries_shipped, libraries, mutation_func):
                 return mutated_child
 
 def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info, libraries_shipped):
-    visited_libs = set()
+    visited_libs = []
     canShip_libs = set()
     shipped_books = set()
     shipped_books_libraries = set()
@@ -50,26 +50,31 @@ def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info
     rand.shuffle(shuffled_libraries)
     shuffled_libraries_aux = copy.copy(shuffled_libraries)
     randlibID = shuffled_libraries_aux[0]
-    randlibSignUp = 0
+    randlibSignUp = libraries[randlibID].sign_up_time
    
     while shipping_days > 0:
 
+        
         if len(shipped_books) == diffbooks: 
             libraries_shipped = visited_libs
             return shipped_books_libraries, libraries_shipped
         elif randlibSignUp == 0 and len(shuffled_libraries_aux) > 0:
+            
             canShip_libs.add(randlibID)
-            visited_libs.add(randlibID)
+            visited_libs.append(randlibID)
             shuffled_libraries_aux.pop(0)
             if(len(shuffled_libraries_aux) > 0):
                 randlibID = shuffled_libraries_aux[0]
                 randlibSignUp = libraries[randlibID].sign_up_time
         for libID in canShip_libs:
+            
             all_books = set(libraries[libID].books.keys())
             available_books = list(all_books - shipped_books)
+            
             if(len(available_books) == 0): continue
             daily_limit = libraries[libID].shipping_time
             selected_books = np.random.choice(available_books, min(len(available_books), daily_limit), replace=False)
+            
             for book in selected_books:
                 shipped_books.add(book)
                 shipped_books_libraries.add((book, libID))
@@ -80,15 +85,12 @@ def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info
     libraries_shipped = visited_libs
     return shipped_books_libraries, libraries_shipped
 
-def generate_determined_library_solution(libraries, shipped_books_libraries, lib_to_add):
+def generate_determined_library_solution(shipped_books_libraries, lib_to_add, best_books):
     
+
     num_books = lib_to_add[1]
 
-    shipped_books = {tup[0] for tup in shipped_books_libraries}
-
-    available_books = [(int(key), int(value)) for key, value in libraries[lib_to_add[0]].books.items() if int(key) not in shipped_books]
-
-    sorted_available_books = sorted(available_books, key=lambda x: x[1], reverse=True)
+    sorted_available_books = sorted(best_books, key=lambda x: x[1], reverse=True)
 
     sorted_available_books = sorted_available_books[:num_books]
 
