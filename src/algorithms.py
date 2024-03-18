@@ -131,20 +131,26 @@ def tabu_search(file_path,init_solution):
 # Simulated Annealing Algorithm
 def get_sa_solution(file_path,init_solution):   
 
+
+
+
     libraries_shipped = set()
 
     data = DataContainer(*read_data(file_path))
     
+
     shipped_books_libraries, libraries_shipped = init_solution(data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped)
 
+    
 
-    num_iterations = 1000
+    num_iterations = 100
     iteration = 0
     temperature = 1000
 
     cooling_rate = 0.999
 
     best_score = ef.evaluate_solution(shipped_books_libraries, data.scores)
+
 
     eval_scores = []
 
@@ -153,7 +159,8 @@ def get_sa_solution(file_path,init_solution):
     best_solution = list(shipped_books_libraries)
 
 
-    if(best_score == sum(int(s) for s in data.scores)): return best_solution, libraries_shipped, eval_scores
+
+    if(best_score == sum(data.scores)): return best_solution, libraries_shipped, eval_scores
 
     while iteration < num_iterations :
 
@@ -162,13 +169,17 @@ def get_sa_solution(file_path,init_solution):
         
 
         neighbor_score = best_score
-        
-        neighbor , neighbor_score = nf.neighbor_solution_exchange_book(best_solution, libraries_shipped, data.libraries, neighbor_score)
-        
-        #neighbor , libraries_shipped = nf.neighbor_exchange_libraries(data.libraries, data.shipping_days, libraries_shipped, best_solution)
-        #neighbor_score = ef.evaluate_solution(neighbor,data.scores)
+
+        neighbor , libraries_shipped = nf.neighbor_exchange_libraries(data.libraries, data.shipping_days, libraries_shipped, best_solution)
+       
+        neighbor_score = ef.evaluate_solution(neighbor,data.scores)
 
 
+
+        if(neighbor_score == sum(data.scores)): return best_solution, libraries_shipped, eval_scores
+        elif(neighbor_score == best_score): return best_solution, libraries_shipped, eval_scores
+
+        
         eval = neighbor_score - best_score
 
         if eval >= 0:
@@ -182,6 +193,8 @@ def get_sa_solution(file_path,init_solution):
             iteration -= 1
 
         eval_scores.append(best_score)
+    
+
 
     return best_solution, libraries_shipped, eval_scores
 
