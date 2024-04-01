@@ -1,5 +1,6 @@
 # Imports 
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from multiprocessing import Manager
 from pparser import read_data
 import hashlib
 import collections
@@ -22,76 +23,97 @@ DataContainer = collections.namedtuple('DataContainer', ['libraries', 'scores', 
 
 # Genetic Algorithm
 def genetic_algorithm(file_path,init_solution):
-    libraries_shipped = set()
+    libraries_shipped = []
     data = DataContainer(*read_data(file_path))
-    population_size = 100
+    population_size = 20
     population = gn.generate_population_parallel(population_size , data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped, init_solution)
+
     population_len = len(population)
+
     population_fitness = None
     crossover_func = op.midpoint_crossover
-    mutation_func = mf.mutation_solution_exchange_book
+    mutation_func = mf.mutation_solution_exchange_libraries
     best_solution = None
     best_score = None
     best_solution_generation = 0 
-    num_iterations = 10
+    num_iterations = 20
     generation_no = 0
     eval_scores = []
+
     population_fitness, old_best_score, old_best_solution , old_individuals_scores = ef.evaluate_population(population, data.scores)
+   
     best_score = old_best_score
     best_solution = old_best_solution 
+    best_library = None
 
     while(num_iterations > 0):
+        
         generation_no += 1
         new_population = []
-        num_offspring = m.floor((population_len - len(new_population))/2)
-
+        num_offspring = m.floor(population_len/2)
+        
+        tournament_size = 5
         with ProcessPoolExecutor() as executor:
-            parent_pairs = [(ef.tournament_select(population, 5, data.scores),
+            parent_pairs = [(ef.tournament_select(population, tournament_size, data.scores),
                             ef.roulette_select(population_fitness, old_individuals_scores))
                             for _ in range(num_offspring)]
             
-            parent_crossover_pairs = [((parent1, parent2), crossover_func) for parent1, parent2 in parent_pairs]
+            parent_crossover_pairs = [((tuple(parent1), tuple(parent2)), crossover_func) for parent1, parent2 in parent_pairs]
             offspring_results = executor.map(gn.generate_offspring_wrapper, parent_crossover_pairs)
-            
-            for offspring in offspring_results:
-                new_population.extend(offspring)
-        
-        new_population = ef.hybrid_elitism(population_len, new_population, old_individuals_scores,  0.2)
-        mutated_offspring = []
-        mutation_probability = 0.2
-
-        with ThreadPoolExecutor() as executor:
-            futures = [executor.submit(gn.mutate, list(child), libraries_shipped, data.libraries, mutation_func) for child in new_population if rand.random() <= mutation_probability]
-            for future in as_completed(futures):
-                mutated_child = future.result()
-                mutated_offspring.append(mutated_child)
+      
+            for offspring1, offspring2 in offspring_results:
                 
-        for child in new_population:
-            if child not in mutated_offspring:
-                mutated_offspring.append(child)
+                new_population.append(offspring1)
+                new_population.append(offspring2)
+    
+        
+        elite_percentage = 0.2
+        new_population = ef.hybrid_elitism(population_len, new_population, old_individuals_scores,  elite_percentage)
+        individual_library = {}
+        individual_key = {}
+        for individual in new_population:
+            op.update_individual_library(individual, individual_library, individual_key)
 
-        new_total_fitness, new_best_fitness, new_best_solution , new_individual_scores = ef.evaluate_population(mutated_offspring, data.scores)
-
-        if new_total_fitness > population_fitness:
-            best_solution = new_best_solution
-            best_score = new_best_fitness
-            population = new_population
-            population_fitness = new_total_fitness
-            old_best_score = new_best_fitness
-            old_best_solution = new_best_solution
-            old_individuals_scores = new_individual_scores
-            best_solution_generation = generation_no
-            eval_scores.append(new_total_fitness)
-        else:
-            eval_scores.append(population_fitness)
-
+     
+        mutated_offspring = []
+        mutation_probability = 0.1
+        
+       
+        with ProcessPoolExecutor(max_workers=7) as executor:
+            futures = [executor.submit(gn.exchange_library_worker, gn.mutate_library, data.libraries, data.shipping_days, individual_library[(tuple(child),individual_key[tuple(child)])], child, mutation_func) for child in new_population if rand.random() <= mutation_probability]
+            for future in as_completed(futures):
+                try:
+                    mutated_child = future.result()
+                    mutated_offspring.append(mutated_child)
+                except Exception as exc:
+                    print(f'Generated an exception: {exc}')
+   
+        num_mutated = len(mutated_offspring)
+        num_new_population = len(new_population)
+        
+        new_population = mutated_offspring + new_population[:num_new_population - num_mutated]
+        print(len(new_population))
+        
+        new_total_fitness, new_best_fitness, new_best_solution , new_individual_scores = ef.evaluate_population(new_population, data.scores)
+       
+        best_solution = new_best_solution
+        best_score = new_best_fitness
+        population = new_population
+        population_fitness = new_total_fitness
+        old_best_score = new_best_fitness
+        old_best_solution = new_best_solution
+        old_individuals_scores = new_individual_scores
+        best_solution_generation = generation_no
+        
+        eval_scores.append(new_total_fitness)
+       
         num_iterations -= 1
+       
 
-    for sol in best_solution:
-        if sol[1] not in libraries_shipped:
-            libraries_shipped.add(sol[1])
+    best_library = ef.get_solution_library(best_solution)
 
-    return  best_solution, libraries_shipped, eval_scores
+    
+    return  best_solution, best_library , eval_scores
 
 # Tabu Search
 def tabu_search(file_path,init_solution):   
@@ -123,10 +145,13 @@ def tabu_search(file_path,init_solution):
 
 # Simulated Annealing Algorithm
 def get_sa_solution(file_path,init_solution):   
+
     libraries_shipped = set()
     data = DataContainer(*read_data(file_path))
     shipped_books_libraries, libraries_shipped = init_solution(data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped)
-    num_iterations = 100
+
+    num_iterations = 10
+
     iteration = 0
     temperature = 1000
     cooling_rate = 0.999
@@ -135,21 +160,24 @@ def get_sa_solution(file_path,init_solution):
 
     eval_scores.append(best_score)
     best_solution = list(shipped_books_libraries)
-    
-    if(best_score == sum(data.scores)): 
-        return best_solution, libraries_shipped, eval_scores
+
+
+    if(best_score == sum(data.scores)): return best_solution, libraries_shipped, eval_scores
+
 
     while iteration < num_iterations :
         temperature *= cooling_rate
         iteration += 1
-        neighbor_score = best_score
-        neighbor , libraries_shipped = nf.neighbor_exchange_libraries(data.libraries, data.shipping_days, libraries_shipped, best_solution)  
-        neighbor_score = ef.evaluate_solution(neighbor,data.scores)
 
-        if(neighbor_score == sum(data.scores)): 
-            return best_solution, libraries_shipped, eval_scores
-        elif(neighbor_score == best_score): 
-            return best_solution, libraries_shipped, eval_scores
+        
+        neighbor_score = best_score
+
+        neighbor , neighbor_score = nf.neighbor_solution_exchange_book(best_solution, libraries_shipped, data.libraries, neighbor_score)
+        
+
+        if(neighbor_score == sum(data.scores)): return best_solution, libraries_shipped, eval_scores
+        elif(neighbor_score == best_score): return best_solution, libraries_shipped, eval_scores
+
         
         eval = neighbor_score - best_score
 
@@ -163,6 +191,7 @@ def get_sa_solution(file_path,init_solution):
             iteration -= 1
 
         eval_scores.append(best_score)
+
     return best_solution, libraries_shipped, eval_scores
 
 # Hill Climbing Algorithm
