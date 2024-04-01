@@ -58,25 +58,23 @@ def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info
             libraries_shipped = visited_libs
             return shipped_books_libraries, libraries_shipped
         elif randlibSignUp == 0 and len(shuffled_libraries_aux) > 0:
-            
             canShip_libs.add(randlibID)
             visited_libs.append(randlibID)
             shuffled_libraries_aux.pop(0)
             if(len(shuffled_libraries_aux) > 0):
                 randlibID = shuffled_libraries_aux[0]
                 randlibSignUp = libraries[randlibID].sign_up_time
-        for libID in canShip_libs:
-            
+        
+        for libID in canShip_libs:    
             all_books = set(libraries[libID].books.keys())
             available_books = list(all_books - shipped_books)
-            
             if(len(available_books) == 0): continue
             daily_limit = libraries[libID].shipping_time
             selected_books = np.random.choice(available_books, min(len(available_books), daily_limit), replace=False)
-            
             for book in selected_books:
                 shipped_books.add(book)
                 shipped_books_libraries.add((book, libID))
+                
         randlibSignUp -= 1
         shipping_days -= 1
 

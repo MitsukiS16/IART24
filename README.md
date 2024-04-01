@@ -8,7 +8,7 @@ This is a Python application designed to given a description of libraries and bo
 
 ## Installation and Usage
 
-Additionally library: numpy
+Additionally library: numpy, tabulate, matplotlib, concurrent.futures, hashlib, collections, math , random, copy, sys, os, tkinter
 To run our application, follow these simple steps:
 
 1. Open a terminal window
@@ -23,7 +23,17 @@ Please be aware that if you have multiple versions of Python installed, you may 
 
 ## Project Scruture
 
-...
+1. Main Menu: Select input file 
+2. SubMenu: Select initial Solution
+- Random
+- Trivial
+3. SubMenu: Select the algorithm 
+- Simulated Annealing
+- Tabu Search
+- Genetic Algorithm
+- Hill Climbing Algorithm
+4. Show graph
+
 
 ## Collaboration
 

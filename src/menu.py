@@ -163,7 +163,7 @@ def book_scanning_menu():
 def print_info(alg_name, file_path, type_initial_population, eval_scores, time_taken):
     clear_screen()
     print("--------------------------------------------------------------------------------")
-    print(f"Algorithm: {alg_name}")
+    print(f"Algorithm: {alg_name[1]}")
     print(f"File: {file_path}")
     print(f"Initial Solution: {type_initial_population}")
     
