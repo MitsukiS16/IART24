@@ -10,6 +10,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
 from PIL import Image, ImageTk
 from tabulate import tabulate
+import csv
 
 class BookScannerGUI(tk.Tk):
     def __init__(self):
@@ -119,7 +120,11 @@ class BookScannerGUI(tk.Tk):
                 self.best_solution , self.best_score, self.scores = algorithm_func[0](self.selected_file_path, initial_solution)
                 print("Best solution:", self.best_solution)
                 print("Best score:", self.best_score)
-                print("Scores:", self.scores)
+                print("Scores=best score:", self.scores)
+
+                xscrollbar = tk.Scrollbar(self.book_scanning_frame, orient=tk.HORIZONTAL)
+                yscrollbar = tk.Scrollbar(self.book_scanning_frame, orient=tk.VERTICAL)
+       
                 # Create a Text widget
                 result_text = tk.Text(self.book_scanning_frame, height=10, width=50, bg="lightgrey")
                 result_text.pack(pady=20)
@@ -134,6 +139,14 @@ class BookScannerGUI(tk.Tk):
                 result_text.insert(tk.END, "Time taken: ", "highlight")
                 result_text.insert(tk.END, f"{elapsed_time:.6f} seconds\n", "style")
 
+                xscrollbar.config(command=result_text.xview)
+                yscrollbar.config(command=result_text.yview)
+                xscrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+                yscrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+                # Set the window size to the size of its contents
+                self.geometry('{}x{}'.format(result_text.winfo_reqwidth(), result_text.winfo_reqheight()))
+
             except Exception as e:
                 ttk.Label(self.book_scanning_frame, text=f"Error: {str(e)}", font=("Arial", 16)).pack(pady=20)
         else:
@@ -141,19 +154,18 @@ class BookScannerGUI(tk.Tk):
         button_frame = ttk.Frame(self.book_scanning_frame)
         button_frame.pack(pady=20)
         ttk.Button(button_frame, text="See Results", command=self.see_results).pack(side=tk.LEFT)
-        ttk.Button(button_frame, text="See Graph", command=self.display_graph).pack(side=tk.LEFT)   
+        ttk.Button(button_frame, text="See Graph", command=self.display_graph).pack(side=tk.LEFT)
+        ttk.Button(button_frame, text="Signup Process", command=self.signup_process).pack(pady=10)
         ttk.Button(self.book_scanning_frame, text="Return to Main Menu", command=self.return_to_main_menu).pack(pady=10)
         
     def display_graph(self):
         # Create a new figure and axes
         fig, ax = plt.subplots()
 
-        # Generate x-coordinates for the bars
-        x = range(len(self.best_solution))
+        x = [0]  # or any other value
 
-        # Plot the scores from the best_solution list as a bar graph
-        for i in range(len(self.best_solution[0])):
-            ax.bar(x, [pt[i] for pt in self.best_solution])
+        # Plot the score as a bar graph
+        ax.bar(x, [self.scores])  # Plot self.scores directly
 
         # Set labels for the x-axis, y-axis, and the title of the graph
         ax.set_xlabel("Instance")
@@ -231,6 +243,41 @@ class BookScannerGUI(tk.Tk):
 
     def exit_application(self):
         self.quit()
+
+    def signup_process(self):
+            # Get the output file path
+        output_file_path = "../output/" + self.file_var.get() + ".txt"
+            
+            # Read the output file
+        with open(output_file_path, 'r') as file:
+            lines = file.readlines()
+        
+        print("file_path_output:", output_file_path)
+        print("lines:", lines)
+
+        # Extract the library numbers and number of books after signup
+        libraries = []
+        books = []
+        for line in lines:
+            if len(line.strip().split()) != 2:
+                continue
+            library, num_books = line.strip().split()
+            print("library:", library)
+            print("num_books:", num_books)
+            libraries.append(int(library))
+            books.append(int(num_books))
+        
+        print("libraries:", libraries)
+        print("books:", books)
+
+            # Create the graph
+        plt.figure(figsize=(10, 6))
+        plt.barh(libraries, books, tick_label=libraries)
+        plt.title('Library Signup Process')
+        plt.xlabel('Number of Books After Signup')
+        plt.ylabel('Library Number')
+        plt.show() 
+
 
 if __name__ == "__main__":
     app = BookScannerGUI()
