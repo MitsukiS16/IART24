@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
 from PIL import Image, ImageTk
+from tabulate import tabulate
 
 class BookScannerGUI(tk.Tk):
     def __init__(self):
@@ -40,7 +41,7 @@ class BookScannerGUI(tk.Tk):
 
         ttk.Label(self.main_frame, text="Welcome to our application", font=("Arial", 16)).pack(pady=20)
         tk.Button(self.main_frame, text="Book Scanning", command=self.book_scanning_menu).pack(pady=10)
-        ttk.Button(self.main_frame, text="See the best score for each library").pack(pady=10)
+        ttk.Button(self.main_frame, text="See the best score for each library", command=self.best_score_menu).pack(pady=10)
         tk.Button(self.main_frame, text="Exit", command=self.exit_application).pack(pady=10)
        
     def clear_frame(self, frame):
@@ -57,16 +58,15 @@ class BookScannerGUI(tk.Tk):
 
         file_options = ["a_example", "b_read_on", "c_incunabula", "d_tough_choices", "e_so_many_books", "f_libraries_of_the_world"]
         self.file_var = tk.StringVar()
-        self.file_var.set(file_options[0])
         ttk.Label(self.book_scanning_frame, text="Please select an input file:").pack(pady=5)
-        file_menu = ttk.OptionMenu(self.book_scanning_frame, self.file_var, *file_options)
+        file_menu = ttk.OptionMenu(self.book_scanning_frame, self.file_var, "Please select an input file", *file_options)
         file_menu.pack(pady=5)
 
         ttk.Button(self.book_scanning_frame, text="Select Algorithm and Run", command=self.select_initial_sol).pack(pady=20)
         ttk.Button(self.book_scanning_frame, text="Return to Main Menu", command=self.return_to_main_menu).pack(pady=10)
 
     def select_initial_sol(self):
-     
+
         self.clear_frame(self.book_scanning_frame)
         self.book_scanning_frame = ttk.Frame(self)
         self.book_scanning_frame.pack(fill=tk.BOTH, expand=True)
@@ -74,29 +74,26 @@ class BookScannerGUI(tk.Tk):
         ttk.Label(self.book_scanning_frame, text="Book Scanning Menu", font=("Arial", 16)).pack(pady=20)
         init_sol_options = ["Random Solution","Trivial Solution","Greedy Solution"]
         self.init_sol_var = tk.StringVar()
-        self.init_sol_var.set(init_sol_options[0])
         ttk.Label(self.book_scanning_frame, text="Please select the initial solution:").pack(pady=5)
-        file_menu = ttk.OptionMenu(self.book_scanning_frame, self.init_sol_var, *init_sol_options)
+        file_menu = ttk.OptionMenu(self.book_scanning_frame, self.init_sol_var, "Please select an initial solution", *init_sol_options)
         file_menu.pack(pady=5)
         ttk.Button(self.book_scanning_frame, text="Next", command=self.select_algorithm).pack(pady=20)
         ttk.Button(self.book_scanning_frame, text="Return to Main Menu", command=self.return_to_main_menu).pack(pady=10)
 
     def select_algorithm(self):
+        
         self.clear_frame(self.book_scanning_frame)
         self.book_scanning_frame = ttk.Frame(self)
         self.book_scanning_frame.pack(fill=tk.BOTH, expand=True)
-        
         #selected_file = self.file_var.get()
         ttk.Label(self.book_scanning_frame, text="Book Scanning Menu", font=("Arial", 16)).pack(pady=20)
         algorithm_options = ["Simulated Annealing","Tabu Search","Genetic Algorithm","Hill Climbing Algorithm"]
         self.sel_alg_var = tk.StringVar()
-        self.sel_alg_var.set(algorithm_options[0])
         ttk.Label(self.book_scanning_frame, text="Please select the initial solution:").pack(pady=5)
-        file_menu = ttk.OptionMenu(self.book_scanning_frame, self.sel_alg_var, *algorithm_options)
+        file_menu = ttk.OptionMenu(self.book_scanning_frame, self.sel_alg_var, "Please select an algorithm", *algorithm_options)
         file_menu.pack(pady=5)
         ttk.Button(self.book_scanning_frame, text="Next", command=self.run_algorithm).pack(pady=20)
         ttk.Button(self.book_scanning_frame, text="Return to Main Menu", command=self.return_to_main_menu).pack(pady=10)
-
 
     def run_algorithm(self):
         self.clear_frame(self.book_scanning_frame)
@@ -137,19 +134,14 @@ class BookScannerGUI(tk.Tk):
                 print("Best score:", self.best_score)
                 print("Scores:", self.scores)
                 # Create a Text widget
-                result_text = tk.Text(self.book_scanning_frame, height=10, width=50)
+                result_text = tk.Text(self.book_scanning_frame, height=10, width=50, bg="lightgrey")
                 result_text.pack(pady=20)
 
                 # Configure tags for different text styles
                 result_text.tag_configure("style", foreground="black", font=("Arial", 14))
                 result_text.tag_configure("highlight", foreground="red", font=("Arial", 14))
-
-                # Insert the results into the Text widget with the specified styles
-                #result_text.insert(tk.END, "Best solution: ", "highlight")
-                #result_text.insert(tk.END, f"{best_solution}\n", "style")
                 result_text.insert(tk.END, "Best Score: ", "highlight")
                 result_text.insert(tk.END, f"{self.scores}\n", "style")
-
                 end_time = time.time() # End time
                 elapsed_time = end_time - start_time 
 
@@ -200,24 +192,61 @@ class BookScannerGUI(tk.Tk):
 
     def best_score_menu(self):
         self.clear_frame(self.main_frame)
-        self.scores_frame = ttk.Frame(self.main_frame)
-        self.scores_frame.pack(fill=tk.BOTH, expand=True)
+        # Clear the current frame
+        self.book_scanning_frame = ttk.Frame(self)
+        self.book_scanning_frame.pack(fill=tk.BOTH, expand=True)
 
-        columns = ('file', 'algorithm', 'score')
-        self.scores_tree = ttk.Treeview(self.scores_frame, columns=columns, show='headings')
-        for col in columns:
-            self.scores_tree.heading(col, text=col.capitalize())
-        self.scores_tree.pack(fill=tk.BOTH, expand=True)
+        # Get the content of the best score
+        content = self.get_content_best_score()
+        # Create a Scrollbar and a Text widget
+        xscrollbar = tk.Scrollbar(self.book_scanning_frame, orient=tk.HORIZONTAL)
+        yscrollbar = tk.Scrollbar(self.book_scanning_frame, orient=tk.VERTICAL)
+        # Create a Text widget with a limited height
+        
+        text = tk.Text(self.book_scanning_frame, wrap=tk.NONE, height=25, xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
+        text.insert(tk.END, content)
+        text.grid(row=0, column=0, sticky='nsew')
+        
+        # Create a button to return to the main menu
+        button = ttk.Button(self.book_scanning_frame, text="Return to Main Menu", command=self.return_to_main_menu)
+        button.grid(row=1, column=0, pady=10)
 
-        # Mock data
-        scores = [
-            ('a_example', 'Simulated Annealing', 95),
-            ('b_read_on', 'Tabu Search', 88),
-            # Add more scores as needed
-        ]
+        # Configure the Scrollbars to scroll the Text widget
+        xscrollbar.config(command=text.xview)
+        yscrollbar.config(command=text.yview)
 
-        for score in scores:
-            self.scores_tree.insert('', tk.END, values=score)
+        # Pack the Scrollbars
+        xscrollbar.grid(row=2, column=0, sticky='ew')
+        yscrollbar.grid(row=0, column=1, sticky='ns', rowspan=2)
+
+        # Configure the grid to expand properly
+        self.book_scanning_frame.grid_columnconfigure(0, weight=1)
+        self.book_scanning_frame.grid_rowconfigure(0, weight=1)
+
+        # Set the window size to the size of its contents
+        self.geometry('{}x{}'.format(text.winfo_reqwidth(), text.winfo_reqheight()))
+
+    def get_content_best_score(self):
+        with open('best_score.txt', 'r') as f:
+            lines = f.readlines()
+
+        # Initialize table headers and rows
+        headers = ['File', 'Initial Solution', 'Algorithm', 'Score', 'Time (sec)']
+        rows = []
+
+        # Skip the first line (header)
+        lines = lines[1:]
+
+        # Parse each line and extract relevant information
+        for line in lines:
+            file_name, initial_solution, algorithm, score, time = line.strip().split(',')
+            rows.append([file_name.strip(), initial_solution.strip(), algorithm.strip(), int(score), float(time)])
+
+        # Generate the table
+        table = tabulate(rows, headers=headers)
+        # Replace spaces with non-breaking spaces
+        table = table.replace(' ', '\u00A0')
+        return table
 
     def return_to_main_menu(self):
         self.clear_frame(self.book_scanning_frame)
