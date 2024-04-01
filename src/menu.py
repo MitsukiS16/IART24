@@ -166,7 +166,13 @@ def print_info(alg_name, file_path, type_initial_population, eval_scores, time_t
     print(f"Algorithm: {alg_name}")
     print(f"File: {file_path}")
     print(f"Initial Solution: {type_initial_population}")
-    print(f"The final score was: {max(eval_scores)}")  
+    
+    if isinstance(eval_scores, list):
+        max_score = max(eval_scores)
+    else:
+        max_score = eval_scores
+        
+    print(f"The final score was: {max_score}")  
     print(f"Time taken: {time_taken:.6f} seconds")
     print("--------------------------------------------------------------------------------")
 
