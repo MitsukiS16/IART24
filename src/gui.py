@@ -3,7 +3,6 @@ from tkinter import ttk, messagebox, filedialog
 import os
 import sys
 import time
-# Assuming 'algorithms' is a module you've written for handling the algorithmsimport algorithms as algo
 import algorithms as algo
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,20 +16,8 @@ class BookScannerGUI(tk.Tk):
         super().__init__()
         self.title("Book Scanner Application")
         self.geometry("300x300")
-        #self.load_background_image('background_image.png')
         self.create_main_menu()
-        #self.load_background_image('background_image.png')
         self.after(100, self.lift_main_frame)
-
-    def load_background_image(self, image_path):
-        bg_image = Image.open(image_path).resize((600, 600), Image.Resampling.LANCZOS)
-        self.background_photo = ImageTk.PhotoImage(bg_image)
-
-        # Add the background image to a label
-        self.background_label = tk.Label(self, image=self.background_photo)
-        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
-        self.background_label.lower()  # Place the background label below other widgets in the same parent
-        self.background_label.image = self.background_photo  # Keep a reference
 
     def lift_main_frame(self):
         self.main_frame.lift()
@@ -137,7 +124,6 @@ class BookScannerGUI(tk.Tk):
                 result_text = tk.Text(self.book_scanning_frame, height=10, width=50, bg="lightgrey")
                 result_text.pack(pady=20)
 
-                # Configure tags for different text styles
                 result_text.tag_configure("style", foreground="black", font=("Arial", 14))
                 result_text.tag_configure("highlight", foreground="red", font=("Arial", 14))
                 result_text.insert(tk.END, "Best Score: ", "highlight")
@@ -157,7 +143,6 @@ class BookScannerGUI(tk.Tk):
         ttk.Button(button_frame, text="See Results", command=self.see_results).pack(side=tk.LEFT)
         ttk.Button(button_frame, text="See Graph", command=self.display_graph).pack(side=tk.LEFT)   
         ttk.Button(self.book_scanning_frame, text="Return to Main Menu", command=self.return_to_main_menu).pack(pady=10)
-        #ttk.Button(self.book_scanning_frame, text="Exit", command=self.exit_application).pack(pady=10)
         
     def display_graph(self):
         # Create a new figure and axes
@@ -192,7 +177,6 @@ class BookScannerGUI(tk.Tk):
 
     def best_score_menu(self):
         self.clear_frame(self.main_frame)
-        # Clear the current frame
         self.book_scanning_frame = ttk.Frame(self)
         self.book_scanning_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -201,25 +185,18 @@ class BookScannerGUI(tk.Tk):
         # Create a Scrollbar and a Text widget
         xscrollbar = tk.Scrollbar(self.book_scanning_frame, orient=tk.HORIZONTAL)
         yscrollbar = tk.Scrollbar(self.book_scanning_frame, orient=tk.VERTICAL)
-        # Create a Text widget with a limited height
-        
+        # Create a Text widget
         text = tk.Text(self.book_scanning_frame, wrap=tk.NONE, height=25, xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
         text.insert(tk.END, content)
         text.grid(row=0, column=0, sticky='nsew')
         
-        # Create a button to return to the main menu
         button = ttk.Button(self.book_scanning_frame, text="Return to Main Menu", command=self.return_to_main_menu)
         button.grid(row=1, column=0, pady=10)
-
-        # Configure the Scrollbars to scroll the Text widget
         xscrollbar.config(command=text.xview)
         yscrollbar.config(command=text.yview)
-
-        # Pack the Scrollbars
         xscrollbar.grid(row=2, column=0, sticky='ew')
         yscrollbar.grid(row=0, column=1, sticky='ns', rowspan=2)
 
-        # Configure the grid to expand properly
         self.book_scanning_frame.grid_columnconfigure(0, weight=1)
         self.book_scanning_frame.grid_rowconfigure(0, weight=1)
 
