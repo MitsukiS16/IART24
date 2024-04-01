@@ -1,5 +1,5 @@
 File, Initial Solution, Algorithm, Score, Time
-a_example.txt, 1, 1, 21, 0.0007545948028564453
+a_example.txt, 1, 1, 21, 0.00028395652770996094
 b_read_on, Random Solution , Simulated Annealing , 4443100, 275 
 c_incunabula, Trivial Solution , Genetic Algorithm , 881132 , 340
 d_tough_choices, Random Solution , Simulated Annealing, 4354090 , 488

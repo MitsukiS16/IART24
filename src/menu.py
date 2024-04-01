@@ -164,7 +164,13 @@ def update_data(selected_algorithm_key, input_file, init_solution, eval_scores, 
         max_score = max(eval_scores)
     else:
         max_score = eval_scores
-    
+
+    # Arredonda o tempo para 5 casas decimais se for menor que 1, caso contrário, exibe como inteiro
+    if elapsed_time < 1:
+        elapsed_time_rounded = round(elapsed_time, 5)
+    else:
+        elapsed_time_rounded = int(elapsed_time)
+
     with open('best_score.txt', 'r') as f:
         lines = f.readlines()
 
@@ -176,7 +182,7 @@ def update_data(selected_algorithm_key, input_file, init_solution, eval_scores, 
             old_score = int(data[3])
             old_time = float(data[4])
             if max_score > old_score or (max_score == old_score and elapsed_time < old_time): 
-                lines[i] = f"{file_name}, {init_solution}, {selected_algorithm_key}, {max_score}, {elapsed_time}\n"
+                lines[i] = f"{file_name}, {init_solution}, {selected_algorithm_key}, {max_score}, {elapsed_time_rounded}\n"
                 break
     
     with open('best_score.txt', 'w') as f:
