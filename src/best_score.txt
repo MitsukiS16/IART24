@@ -4,4 +4,4 @@ b_read_on.txt, Random Solution, Simulated Annealing, 4474800, 4
 c_incunabula.txt, Random Solution, Tabu Search, 1003295, 17
 d_tough_choices.txt, Random Solution , Simulated Annealing, 4354090 , 488
 e_so_many_books.txt, Trivial Solution, Genetic Algorithm, 4519378, 5
-f_libraries_of_the_world.txt, Random Solution, Simulated Annealing, 1398207, 0.79812
+f_libraries_of_the_world.txt, Trivial Solution, Genetic Algorithm, 3296427, 30

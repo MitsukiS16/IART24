@@ -79,5 +79,5 @@ All books are scanned in the scanning facility. The entire process of sending th
 | c_incunabula ([input](input/c_incunabula.txt) \| [output](output/c_incunabula.txt)) | 1,003,295 |
 | d_tough_choices ([input](input/d_tough_choices.txt) \| [output](output/d_tough_choices.txt)) | 4,354,090 |
 | e_so_many_books ([input](input/e_so_many_books.txt) \| [output](output/e_so_many_books.txt)) | 4,519,378 |
-| f_libraries_of_the_world ([input](input/f_libraries_of_the_world.txt) \| [output](output/f_libraries_of_the_world.txt)) | 1,398,207 |
+| f_libraries_of_the_world ([input](input/f_libraries_of_the_world.txt) \| [output](output/f_libraries_of_the_world.txt)) | 3,296,427 |
 | **Total** | **0** |
