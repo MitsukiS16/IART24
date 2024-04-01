@@ -8,7 +8,6 @@ import evaluate_funcs as ef
 import neighbor_funcs as nf
 import mutation_funcs as mf
 import generators as gn
-from generators import generate_random_solution
 import operators as op
 import numpy as np
 import math as m
@@ -118,18 +117,12 @@ def genetic_algorithm(file_path,init_solution):
 
 # Tabu Search
 def tabu_search(file_path,init_solution):   
-
     libraries_shipped = set()
-
     data = DataContainer(*read_data(file_path))
-    
     shipped_books_libraries, libraries_shipped = init_solution(data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped)
-
     num_iterations = 1000
     tabu_tenure = 10
-
     eval_scores = []
-
     tabu_deque = collections.deque()
 
     best_score = ef.evaluate_solution(shipped_books_libraries, data.scores)
@@ -154,35 +147,28 @@ def tabu_search(file_path,init_solution):
 def get_sa_solution(file_path,init_solution):   
 
     libraries_shipped = set()
-
     data = DataContainer(*read_data(file_path))
-    
-
     shipped_books_libraries, libraries_shipped = init_solution(data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped)
 
-    
-
     num_iterations = 10
+
     iteration = 0
     temperature = 1000
-
     cooling_rate = 0.999
-
     best_score = ef.evaluate_solution(shipped_books_libraries, data.scores)
-
-
     eval_scores = []
 
     eval_scores.append(best_score)
-    
     best_solution = list(shipped_books_libraries)
+
 
     if(best_score == sum(data.scores)): return best_solution, libraries_shipped, eval_scores
 
-    while iteration < num_iterations :
 
+    while iteration < num_iterations :
         temperature *= cooling_rate
         iteration += 1
+
         
         neighbor_score = best_score
 
@@ -202,24 +188,17 @@ def get_sa_solution(file_path,init_solution):
             best_solution = neighbor
             best_score = neighbor_score
             
-            
             iteration -= 1
 
         eval_scores.append(best_score)
-    
-    
-    
+
     return best_solution, libraries_shipped, eval_scores
 
 # Hill Climbing Algorithm
 def hill_climbing_algorithm(file_path, init_solution):
-
     libraries_shipped = set()
-
     data = DataContainer(*read_data(file_path))
-
     shipped_books_libraries, libraries_shipped = init_solution(data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped)
-
     best_score = ef.evaluate_solution(shipped_books_libraries, data.scores)
     best_sol = list(shipped_books_libraries)
     
