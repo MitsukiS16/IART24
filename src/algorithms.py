@@ -95,18 +95,12 @@ def genetic_algorithm(file_path,init_solution):
 
 # Tabu Search
 def tabu_search(file_path,init_solution):   
-
     libraries_shipped = set()
-
     data = DataContainer(*read_data(file_path))
-    
     shipped_books_libraries, libraries_shipped = init_solution(data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped)
-
     num_iterations = 1000
     tabu_tenure = 10
-
     eval_scores = []
-
     tabu_deque = collections.deque()
 
     best_score = ef.evaluate_solution(shipped_books_libraries, data.scores)
@@ -129,55 +123,33 @@ def tabu_search(file_path,init_solution):
 
 # Simulated Annealing Algorithm
 def get_sa_solution(file_path,init_solution):   
-
-
-
-
     libraries_shipped = set()
-
     data = DataContainer(*read_data(file_path))
-    
-
     shipped_books_libraries, libraries_shipped = init_solution(data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped)
-
-    
-
     num_iterations = 100
     iteration = 0
     temperature = 1000
-
     cooling_rate = 0.999
-
     best_score = ef.evaluate_solution(shipped_books_libraries, data.scores)
-
-
     eval_scores = []
 
     eval_scores.append(best_score)
-    
     best_solution = list(shipped_books_libraries)
-
-
-
-    if(best_score == sum(data.scores)): return best_solution, libraries_shipped, eval_scores
+    
+    if(best_score == sum(data.scores)): 
+        return best_solution, libraries_shipped, eval_scores
 
     while iteration < num_iterations :
-
         temperature *= cooling_rate
         iteration += 1
-        
-
         neighbor_score = best_score
-
-        neighbor , libraries_shipped = nf.neighbor_exchange_libraries(data.libraries, data.shipping_days, libraries_shipped, best_solution)
-       
+        neighbor , libraries_shipped = nf.neighbor_exchange_libraries(data.libraries, data.shipping_days, libraries_shipped, best_solution)  
         neighbor_score = ef.evaluate_solution(neighbor,data.scores)
 
-
-
-        if(neighbor_score == sum(data.scores)): return best_solution, libraries_shipped, eval_scores
-        elif(neighbor_score == best_score): return best_solution, libraries_shipped, eval_scores
-
+        if(neighbor_score == sum(data.scores)): 
+            return best_solution, libraries_shipped, eval_scores
+        elif(neighbor_score == best_score): 
+            return best_solution, libraries_shipped, eval_scores
         
         eval = neighbor_score - best_score
 
@@ -188,24 +160,16 @@ def get_sa_solution(file_path,init_solution):
             best_solution = neighbor
             best_score = neighbor_score
             
-            
             iteration -= 1
 
         eval_scores.append(best_score)
-    
-
-
     return best_solution, libraries_shipped, eval_scores
 
 # Hill Climbing Algorithm
 def hill_climbing_algorithm(file_path, init_solution):
-
     libraries_shipped = set()
-
     data = DataContainer(*read_data(file_path))
-
     shipped_books_libraries, libraries_shipped = init_solution(data.libraries, data.diffbooks, data.shipping_days, data.libraries_info, libraries_shipped)
-
     best_score = ef.evaluate_solution(shipped_books_libraries, data.scores)
     best_sol = list(shipped_books_libraries)
     
