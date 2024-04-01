@@ -131,6 +131,8 @@ class BookScannerGUI(tk.Tk):
 
                 result_text.tag_configure("style", foreground="black", font=("Arial", 14))
                 result_text.tag_configure("highlight", foreground="red", font=("Arial", 14))
+                result_text.insert(tk.END, "Algorithm : ", "highlight")
+                result_text.insert(tk.END, f"{algorithm_func[1]}\n", "style")
                 result_text.insert(tk.END, "Best Score: ", "highlight")
                 if isinstance(self.scores, list):
                     max_score = max(self.scores)
@@ -159,7 +161,7 @@ class BookScannerGUI(tk.Tk):
         button_frame.pack(pady=20)
         ttk.Button(button_frame, text="See Results", command=self.see_results).pack(side=tk.LEFT)
         ttk.Button(button_frame, text="See Graph", command=self.display_graph).pack(side=tk.LEFT)
-        ttk.Button(button_frame, text="Signup Process", command=self.signup_process).pack(pady=10)
+        ttk.Button(self.book_scanning_frame, text="Signup Process", command=self.signup_process).pack(pady=10)
         ttk.Button(self.book_scanning_frame, text="Return to Main Menu", command=self.return_to_main_menu).pack(pady=10)
         
     def display_graph(self):
@@ -167,30 +169,22 @@ class BookScannerGUI(tk.Tk):
         fig, ax = plt.subplots()
 
         if self.sel_alg_var.get() == "Hill Climbing Algorithm":
-            # Generate x-coordinate for the bar
-            x = [0]  # or any other value
-            # Plot the score as a bar graph
-            ax.bar(x, [self.scores])  # Plot self.scores directly
-
+            x = [0]
+            ax.bar(x, [self.scores])
         else:
-            # Generate x-coordinates for the bars
             x = range(len(self.scores))
-            # Plot the scores as a bar graph
-            ax.bar(x, self.scores) 
+            ax.bar(x, self.scores, edgecolor='black') 
 
         # Set labels for the x-axis, y-axis, and the title of the graph
         ax.set_xlabel("Instance")
         ax.set_ylabel("Score Value")
         ax.set_title("Score Variation per Instance")
-
         # Create a new Toplevel window
         graph_window = tk.Toplevel(self.book_scanning_frame)
 
         # Create a canvas and add the plot to it
         canvas = FigureCanvasTkAgg(fig, master=graph_window)
         canvas.draw()
-
-        # Add the canvas to the tkinter frame
         canvas.get_tk_widget().pack()
 
         
