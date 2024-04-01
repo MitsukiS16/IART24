@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox, filedialog
 import os
 import sys
 import time
+import generators as gen
 import algorithms as algo
 import numpy as np
 import matplotlib.pyplot as plt
@@ -60,7 +61,7 @@ class BookScannerGUI(tk.Tk):
         self.book_scanning_frame.pack(fill=tk.BOTH, expand=True)
 
         ttk.Label(self.book_scanning_frame, text="Book Scanning Menu", font=("Arial", 16)).pack(pady=20)
-        init_sol_options = ["Random Solution","Trivial Solution","Greedy Solution"]
+        init_sol_options = ["Random Solution","Trivial Solution"]
         self.init_sol_var = tk.StringVar()
         ttk.Label(self.book_scanning_frame, text="Please select the initial solution:").pack(pady=5)
         file_menu = ttk.OptionMenu(self.book_scanning_frame, self.init_sol_var, "Please select an initial solution", *init_sol_options)
@@ -97,9 +98,8 @@ class BookScannerGUI(tk.Tk):
         }
 
         initial_solution_map = {
-            "Random Solution": algo.generate_random_solution, 
-            # "Trivial Solution": algo.trivial_solution, 
-            # "Greedy Solution": algo.greedy_solution,  
+            "Random Solution": gen.generate_random_solution, 
+            "Trivial Solution": gen.generate_trivial_solution 
         }
 
         # Fetch the function based on user selection
@@ -132,7 +132,11 @@ class BookScannerGUI(tk.Tk):
                 result_text.tag_configure("style", foreground="black", font=("Arial", 14))
                 result_text.tag_configure("highlight", foreground="red", font=("Arial", 14))
                 result_text.insert(tk.END, "Best Score: ", "highlight")
-                result_text.insert(tk.END, f"{self.scores}\n", "style")
+                if isinstance(self.scores, list):
+                    max_score = max(self.scores)
+                else:
+                    max_score = self.scores
+                result_text.insert(tk.END, f"{max_score}\n", "style")
                 end_time = time.time() # End time
                 elapsed_time = end_time - start_time 
 
@@ -162,10 +166,17 @@ class BookScannerGUI(tk.Tk):
         # Create a new figure and axes
         fig, ax = plt.subplots()
 
-        x = [0]  # or any other value
+        if self.sel_alg_var.get() == "Hill Climbing Algorithm":
+            # Generate x-coordinate for the bar
+            x = [0]  # or any other value
+            # Plot the score as a bar graph
+            ax.bar(x, [self.scores])  # Plot self.scores directly
 
-        # Plot the score as a bar graph
-        ax.bar(x, [self.scores])  # Plot self.scores directly
+        else:
+            # Generate x-coordinates for the bars
+            x = range(len(self.scores))
+            # Plot the scores as a bar graph
+            ax.bar(x, self.scores) 
 
         # Set labels for the x-axis, y-axis, and the title of the graph
         ax.set_xlabel("Instance")
@@ -218,19 +229,15 @@ class BookScannerGUI(tk.Tk):
     def get_content_best_score(self):
         with open('best_score.txt', 'r') as f:
             lines = f.readlines()
-
         # Initialize table headers and rows
         headers = ['File', 'Initial Solution', 'Algorithm', 'Score', 'Time (sec)']
         rows = []
-
         # Skip the first line (header)
         lines = lines[1:]
-
         # Parse each line and extract relevant information
         for line in lines:
             file_name, initial_solution, algorithm, score, time = line.strip().split(',')
             rows.append([file_name.strip(), initial_solution.strip(), algorithm.strip(), int(score), float(time)])
-
         # Generate the table
         table = tabulate(rows, headers=headers)
         # Replace spaces with non-breaking spaces
@@ -252,8 +259,8 @@ class BookScannerGUI(tk.Tk):
         with open(output_file_path, 'r') as file:
             lines = file.readlines()
         
-        print("file_path_output:", output_file_path)
-        print("lines:", lines)
+        #print("file_path_output:", output_file_path)
+        #print("lines:", lines)
 
         # Extract the library numbers and number of books after signup
         libraries = []
@@ -262,15 +269,15 @@ class BookScannerGUI(tk.Tk):
             if len(line.strip().split()) != 2:
                 continue
             library, num_books = line.strip().split()
-            print("library:", library)
-            print("num_books:", num_books)
+            #print("library:", library)
+            #print("num_books:", num_books)
             libraries.append(int(library))
             books.append(int(num_books))
         
-        print("libraries:", libraries)
-        print("books:", books)
+        #print("libraries:", libraries)
+        #print("books:", books)
 
-            # Create the graph
+        # Create the graph
         plt.figure(figsize=(10, 6))
         plt.barh(libraries, books, tick_label=libraries)
         plt.title('Library Signup Process')
