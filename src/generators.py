@@ -4,6 +4,8 @@ import random as rand
 import numpy as np
 import operators as op
 
+books_per_day = []
+
 def generate_population(population_size, libraries, diffbooks, shipping_days, libraries_info, libraries_shipped, init_solution):
     solutions = []
     for i in range(population_size):
@@ -66,7 +68,8 @@ def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info
     shuffled_libraries_aux = copy.copy(shuffled_libraries)
     randlibID = shuffled_libraries_aux[0]
     randlibSignUp = libraries[randlibID].sign_up_time
-   
+    book_counter = 0
+    global books_per_day 
     while shipping_days > 0:        
         if len(shipped_books) == diffbooks: 
             libraries_shipped = visited_libs
@@ -88,9 +91,13 @@ def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info
             for book in selected_books:
                 shipped_books.add(book)
                 shipped_books_libraries.append((book, libID))
+                book_counter += 1
+            books_per_day.append(book_counter)
+            book_counter = 0
 
         randlibSignUp -= 1
         shipping_days -= 1
+        
 
     libraries_shipped = visited_libs
     return shipped_books_libraries, libraries_shipped
@@ -135,4 +142,6 @@ def generate_determined_library_solution(shipped_books_libraries, lib_to_add, be
     shipped_books_libraries.extend(new_books)
 
     return shipped_books_libraries
-          
+
+def get_books_per_day():
+    return books_per_day

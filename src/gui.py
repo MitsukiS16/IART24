@@ -109,19 +109,17 @@ class BookScannerGUI(tk.Tk):
     
         self.selected_file_path = "../input/" + self.file_var.get() + ".txt"
 
-        print("path:", self.selected_file_path)
-        print("init", self.init_sol_var.get())
-        print("algorithm:", self.sel_alg_var.get())
+        #print("path:", self.selected_file_path)
+        #print("init", self.init_sol_var.get())
+        #print("algorithm:", self.sel_alg_var.get())
+
+
 
         start_time = time.time()
 
         if algorithm_func and initial_solution:
             try:
                 self.best_solution , self.best_score, self.scores = algorithm_func[0](self.selected_file_path, initial_solution)
-                print("Best solution:", self.best_solution)
-                print("Best score:", self.best_score)
-                print("Scores=best score:", self.scores)
-
                 xscrollbar = tk.Scrollbar(self.book_scanning_frame, orient=tk.HORIZONTAL)
                 yscrollbar = tk.Scrollbar(self.book_scanning_frame, orient=tk.VERTICAL)
        
@@ -226,7 +224,6 @@ class BookScannerGUI(tk.Tk):
         # Initialize table headers and rows
         headers = ['File', 'Initial Solution', 'Algorithm', 'Score', 'Time (sec)']
         rows = []
-        # Skip the first line (header)
         lines = lines[1:]
         # Parse each line and extract relevant information
         for line in lines:
@@ -246,37 +243,15 @@ class BookScannerGUI(tk.Tk):
         self.quit()
 
     def signup_process(self):
-            # Get the output file path
-        output_file_path = "../output/" + self.file_var.get() + ".txt"
-            
-            # Read the output file
-        with open(output_file_path, 'r') as file:
-            lines = file.readlines()
-        
-        #print("file_path_output:", output_file_path)
-        #print("lines:", lines)
-
-        # Extract the library numbers and number of books after signup
-        libraries = []
-        books = []
-        for line in lines:
-            if len(line.strip().split()) != 2:
-                continue
-            library, num_books = line.strip().split()
-            #print("library:", library)
-            #print("num_books:", num_books)
-            libraries.append(int(library))
-            books.append(int(num_books))
-        
-        #print("libraries:", libraries)
-        #print("books:", books)
-
         # Create the graph
+
+        books_per_day = gen.books_per_day
         plt.figure(figsize=(10, 6))
-        plt.barh(libraries, books, tick_label=libraries)
+        days = range(len(books_per_day))
+        plt.barh(days, books_per_day,color='skyblue')
         plt.title('Library Signup Process')
-        plt.xlabel('Number of Books After Signup')
-        plt.ylabel('Library Number')
+        plt.xlabel('Books per day')
+        plt.ylabel('Days')
         plt.show() 
 
 
