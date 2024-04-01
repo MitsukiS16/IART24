@@ -2,9 +2,9 @@
 
 ## Project Description
 
-This is a Python application deesigend to given a description of libraries and books available, plan which books to scan from which library to maximize the total score of all scanned books, taking into account that each library needs to be signed up before it can ship books
+This is a Python application designed to given a description of libraries and books available, plan which books to scan from which library to maximize the total score of all scanned books, taking into account that each library needs to be signed up before it can ship books
 
-`Note: Your score is the sum of the scores of all books that are scanned within D days. Note that if the same book is shipped from multiple libraries (as books 2 and 3 are in the gure below), the solution will be accepted but the score for the book will be awarded only once.`
+`Note: Your score is the sum of the scores of all books that are scanned within D days. Note that if the same book is shipped from multiple libraries, the solution will be accepted but the score for the book will be awarded only once.`
 
 ## Installation and Usage
 
@@ -14,6 +14,8 @@ To run our application, follow these simple steps:
 1. Open a terminal window
 2. Navigate to the src folder using the cd command: `cd src`
 3. Execute the following command to compile and run the program: `python main.py`
+
+`Note`: If you want to run the application with a graphical interface, you should use the following command: `python gui.py`
 
 Please be aware that if you have multiple versions of Python installed, you may need to specify the version you want to use.
 
@@ -26,8 +28,8 @@ Please be aware that if you have multiple versions of Python installed, you may 
 ## Collaboration
 
 - Clarisse Maria Teixeira de Carvalho, up202008444
-- Válter Ochôa de Spínola Catanho Castro, up
-- Sandra Patricia Linhares Miranda, up
+- Válter Ochôa de Spínola Catanho Castro, up201706546
+- Sandra Patricia Linhares Miranda, up202007675
 
 ## Algorithms
 
@@ -37,19 +39,12 @@ Initial Solutions:
 - Trivial Solution
 - Greedy Constrution
 
-Algorithms to implement:
+Algorithms Implemented:
 
-- [Metaheuristic Methods] Genetic
-  [Metaheuristic Methods] Simulated Annealing
-- [Metaheuristic Methods] Particle Swarm Optimization
-- [Iterative Methods] Gradient Descent
-- [Iterative Methods] Newton's Method
-- [Iterative Methods] Conjugate Gradient Method
-- [Analytical Methods] Calculus-based Optimization
-- [Analytical Methods] Linear Programming
-- [Derivative-Free Optimization] Pattern Search
-- [Derivative-Free Optimization] Nelder-Mead Method
-- [Derivative-Free Optimization] Evolutionary Strategies
+- [Metaheuristic Methods] Genetic Algorithm
+- [Metaheuristic Methods] Simulated Annealing
+- [Metaheuristic Methods] Tabu Search
+- [Metaheuristic Methods] Hill Climbing Algorithm
 
 ## Restricitions
 
