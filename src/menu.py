@@ -165,7 +165,6 @@ def update_data(selected_algorithm_key, input_file, init_solution, eval_scores, 
     else:
         max_score = eval_scores
 
-    # Arredonda o tempo para 5 casas decimais se for menor que 1, caso contrário, exibe como inteiro
     if elapsed_time < 1:
         elapsed_time_rounded = round(elapsed_time, 5)
     else:
@@ -184,8 +183,10 @@ def update_data(selected_algorithm_key, input_file, init_solution, eval_scores, 
             old_score = int(data[3])
             old_time = float(data[4])
             if max_score > old_score or (max_score == old_score and elapsed_time < old_time): 
-                lines[i] = f"{file_name}, {init_solution_name}, {algorithm_name}, {max_score}, {elapsed_time_rounded}\n"
-                break
+                if (i == 1 and max_score <= 21) or (i == 2 and max_score <= 6000000) or (i == 3 and max_score < 6000000) or (i == 4 and max_score < 6000000) or (i == 5 and max_score < 6000000) or (i == 6 and max_score < 6000000) :
+                    lines[i] = f"{file_name}, {init_solution_name}, {algorithm_name}, {max_score}, {elapsed_time_rounded}\n"
+                    write_data(f'{OUTPUT_FILES[input_file]}', best_solution, libraries_shipped)
+                    break
     
     with open('best_score.txt', 'w') as f:
         f.writelines(lines)
@@ -193,7 +194,6 @@ def update_data(selected_algorithm_key, input_file, init_solution, eval_scores, 
     INITIAL_SOLUTIONS[input_file] = (INITIAL_SOLUTIONS[init_solution][0], init_solution)
     ALGORITHMS[input_file] = ALGORITHMS[selected_algorithm_key]
 
-    write_data(f'{OUTPUT_FILES[input_file]}', best_solution, libraries_shipped)
 
 
 # Helper function to print algorithm information
