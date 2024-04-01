@@ -1,7 +1,7 @@
 File, Initial Solution, Algorithm, Score, Time
 a_example.txt, Random Solution, Simulated Annealing, 21, 0.00028
 b_read_on.txt, Random Solution, Simulated Annealing, 4474800, 4
-c_incunabula.txt, Trivial Solution , Genetic Algorithm , 881132 , 340
+c_incunabula.txt, Random Solution, Tabu Search, 1003295, 17
 d_tough_choices.txt, Random Solution , Simulated Annealing, 4354090 , 488
-e_so_many_books.txt, Random Solution , Simulated Annealing, 768613 , 10
-f_libraries_of_the_world.txt, Random Solution , Simulated Annealing, 870870 , 232
+e_so_many_books.txt, Trivial Solution, Genetic Algorithm, 4519378, 5
+f_libraries_of_the_world.txt, Random Solution, Simulated Annealing, 1398207, 0.79812
