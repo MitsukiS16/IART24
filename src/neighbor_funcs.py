@@ -28,17 +28,23 @@ def neighbor_exchange_libraries(libraries, shipping_days, shipped_libraries, shi
     library_efficiency = []
     remaining_shipping_days = shipping_days
 
+
     for libID in shipped_libraries:
         sign_up_time = libraries[libID].sign_up_time
         shipping_time = libraries[libID].shipping_time
         efficiency, days_left = ef.evaluate_library_efficiency(sign_up_time, remaining_shipping_days, shipping_time)
         remaining_shipping_days -= sign_up_time
         shipped_library_efficiency.append((libID, efficiency, days_left))
+
+    sorted_shipped_library_efficiency = sorted(shipped_library_efficiency, key=lambda x: x[1])
+
         
     sorted_shipped_library_efficiency = sorted(shipped_library_efficiency, key=lambda x: x[1])
     lib_to_remove = sorted_shipped_library_efficiency[0][0]
+
     lib_to_remove_days_left = sorted_shipped_library_efficiency[0][2]
     library_keys = libraries.keys()
+
     available_libraries = [libID for libID in library_keys if int(libID) not in shipped_libraries]
 
     for libID in available_libraries:
@@ -49,14 +55,22 @@ def neighbor_exchange_libraries(libraries, shipping_days, shipped_libraries, shi
     
     sorted_library_efficiency = sorted(library_efficiency, key=lambda x: x[1])
 
-    if(sorted_library_efficiency[-1][1] <= 0): 
-        return shipped_books_libraries, shipped_libraries
-    elif(sorted_library_efficiency[-1][1] < sorted_shipped_library_efficiency[0][1]): 
-        return shipped_books_libraries, shipped_libraries
+    
+    
+    if(sorted_library_efficiency[-1][1] <= 0): return shipped_books_libraries, shipped_libraries
+    elif(sorted_library_efficiency[-1][1] < sorted_shipped_library_efficiency[0][1]): return shipped_books_libraries, shipped_libraries
 
+
+   
     best_library , best_books = ef.evaluate_library_book_efficiency(libraries, sorted_library_efficiency, shipped_books_libraries)
+
+    
+    lib_to_remove_index = shipped_libraries.index(lib_to_remove)
+    
     shipped_libraries.remove(lib_to_remove)
-    shipped_libraries.append(best_library[0])
+
+    shipped_libraries.insert(lib_to_remove_index, best_library[0])
+
     lib_to_add = best_library
     
     for book_lib in shipped_books_libraries:
