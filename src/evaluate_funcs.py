@@ -1,19 +1,25 @@
 import random
 import numpy as np
 import math as m
+import hashlib
 from concurrent.futures import ProcessPoolExecutor, as_completed
+import operators as op
 
 
 def evaluate_population(population, scores):
     individual_to_future = {}
+   
     total_fitness = 0
     best_score = 0
     best_solution = None
     with ProcessPoolExecutor() as executor:
         for individual in population:
+            
             individual_key = tuple(individual)
+            
             future = executor.submit(evaluate_solution, individual, scores)
             individual_to_future[individual_key] = future
+            
         for future in as_completed(individual_to_future.values()):  
             individual = {v: k for k, v in individual_to_future.items()}[future]
             try:
@@ -68,12 +74,15 @@ def get_greatest_fit(population, scores):
 def tournament_select(population, tournament_size, scores):
     participants = random.sample(population, k=tournament_size)
 
+
     best_individual = max(participants, key=lambda ind: evaluate_solution(ind, scores))
 
-    return list(best_individual)
+    
+    return best_individual
 
 def roulette_select(total_fitness, old_scores_individuals):
 
+    #print(old_scores_individuals)
     spin_value = np.random.uniform(0, 1)
     cumulative_fitness = 0
     last_individual = None
@@ -82,7 +91,9 @@ def roulette_select(total_fitness, old_scores_individuals):
         last_individual = individual
         cumulative_fitness += m.floor(score / total_fitness)
         if cumulative_fitness >= spin_value:
+            
             return list(individual)
+    
     return list(last_individual)
 
 def evaluate_library_efficiency(sign_up_time, shipping_days, shipping_time):
@@ -91,21 +102,34 @@ def evaluate_library_efficiency(sign_up_time, shipping_days, shipping_time):
 def evaluate_library_book_efficiency(libraries, available_libraries, shipped_books):
 
     best_library = None
-    len_avail_books = m.inf
+    max_available_books = 0
     best_books = []
 
     for library in reversed(available_libraries):
         available_books = evaluate_available_books(library, libraries, shipped_books)
-        if(library[1] - len(available_books) < len_avail_books):
-            len_avail_books = library[1] - len(available_books)
-            best_library = library
-            best_books = available_books
+        if len(available_books) >= library[1]:  
+            return library, available_books  
 
     
-    return best_library, best_books
+    for library in reversed(available_libraries):
+        available_books = evaluate_available_books(library, libraries, shipped_books)
+        if len(available_books) > max_available_books:
+            return library, available_books
+           
+
+    return available_libraries[-1], evaluate_available_books(available_libraries[-1, libraries, shipped_books])
 
 def evaluate_available_books(lib, libraries, shipped_books):
 
     available_books = [(int(key), int(value)) for key, value in libraries[lib[0]].books.items() if int(key) not in shipped_books]
 
     return available_books
+
+def get_solution_library(individual):
+    new_libraries = []
+    for book in individual:
+        libID = book[1]
+        if libID not in new_libraries:
+            new_libraries.append(libID)
+    return new_libraries
+

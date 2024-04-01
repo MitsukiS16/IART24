@@ -2,6 +2,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import copy
 import random as rand
 import numpy as np
+import operators as op
 
 def generate_population(population_size, libraries, diffbooks, shipping_days, libraries_info, libraries_shipped, init_solution):
     solutions = []
@@ -13,6 +14,9 @@ def generate_population(population_size, libraries, diffbooks, shipping_days, li
 def worker(init_solution, libraries, diffbooks, shipping_days, libraries_info, libraries_shipped):
         return init_solution(libraries, diffbooks, shipping_days, libraries_info, libraries_shipped)
 
+def exchange_library_worker(mutation_func_aux, libraries, shipping_days, individual_library, shipped_books_libraries, mutation_func):
+     return mutation_func_aux(libraries, shipping_days, individual_library, shipped_books_libraries, mutation_func)
+
 def generate_population_parallel(population_size, libraries, diffbooks, shipping_days, libraries_info, libraries_shipped, init_solution):
     solutions = []
 
@@ -21,8 +25,9 @@ def generate_population_parallel(population_size, libraries, diffbooks, shipping
 
         for future in as_completed(future_to_index):
             try:
-                shipped_books_libraries, _ = future.result()
+                shipped_books_libraries, libs_shipped = future.result()
                 solutions.append(list(shipped_books_libraries))
+                libraries_shipped.append(libs_shipped)
             except Exception as exc:
                 print(f'Generated an exception: {exc}')
     
@@ -30,22 +35,30 @@ def generate_population_parallel(population_size, libraries, diffbooks, shipping
 
 
 def generate_offspring(pairs, cross_func):
+
     tournament_winner, roulette_winner = pairs
-    return cross_func(tournament_winner, roulette_winner)
+    
+    new_individual1 , new_individual2 = cross_func(tournament_winner, roulette_winner)
+
+    return new_individual1, new_individual2
 
 def generate_offspring_wrapper(args):
     parents, crossover_func = args
-    return generate_offspring(parents, crossover_func)
+    return generate_offspring(parents,  crossover_func)
 
-def mutate(child, libraries_shipped, libraries, mutation_func):
+def mutate_book(child, libraries_shipped, libraries, mutation_func):
                 mutated_child, _ = mutation_func(child, libraries_shipped, libraries, 0)
+                return mutated_child
+
+def mutate_library(libraries, shipping_days, shipped_libraries, shipped_books_libraries, mutation_func):
+                mutated_child, _ = mutation_func(libraries, shipping_days, shipped_libraries, list(shipped_books_libraries))
                 return mutated_child
 
 def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info, libraries_shipped):
     visited_libs = []
     canShip_libs = set()
     shipped_books = set()
-    shipped_books_libraries = set()
+    shipped_books_libraries = []
     shuffled_libraries = libraries_info.copy()
     rand.shuffle(shuffled_libraries)
     shuffled_libraries_aux = copy.copy(shuffled_libraries)
@@ -77,7 +90,7 @@ def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info
             
             for book in selected_books:
                 shipped_books.add(book)
-                shipped_books_libraries.add((book, libID))
+                shipped_books_libraries.append((book, libID))
         randlibSignUp -= 1
         shipping_days -= 1
    
