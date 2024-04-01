@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from pparser import write_data
 from tabulate import tabulate
 
-from algorithms import generate_random_solution
+from generators import generate_random_solution, generate_trivial_solution
 from algorithms import genetic_algorithm, tabu_search, get_sa_solution, hill_climbing_algorithm
 
 ########################################
@@ -31,10 +31,12 @@ OUTPUT_FILES = {
     '6': '../output/f_libraries_of_the_world.txt'
 }
 
+rs = "Random Solution"
+ts = "Trivial Solution"
+
 INITIAL_SOLUTIONS = {
-    '1': generate_random_solution,
-    '2': "trivial_population",
-    # add more
+    '1': (generate_random_solution, rs),
+    '2': (generate_trivial_solution, ts)
 }
 
 sa = "Simulated Annealing"
@@ -47,7 +49,6 @@ ALGORITHMS =  {
     '2': (tabu_search, ts),
     '3': (genetic_algorithm, ga),
     '4': (hill_climbing_algorithm, hc)
-    # add more
 }
 
 
@@ -65,11 +66,10 @@ def exit_application():
     sys.exit()
 
 # Input Handling Function
-def error_handling_input(input):
-    if input not in INPUT_FILES and input not in INITIAL_SOLUTIONS and input not in ALGORITHMS: 
-        print("Invalid choice. Please enter a valid option.")
-        input("Press Enter to continue...")
-        return book_scanning_menu()
+def error_handling_input():
+    print("Invalid option.")
+    input("Press Enter to continue...")
+    return book_scanning_menu()
 
 
 ########################################
@@ -87,7 +87,7 @@ def select_initial_population():
     clear_screen()
     print("Please select initial population:")
     for key, value in INITIAL_SOLUTIONS.items():
-        print(f"{key}. {value}")
+        print(f"{key}. {value[1]}")
     print("-------------------------------------------------------------")
     choice = input("Please enter your choice: ")
     return choice
@@ -128,19 +128,23 @@ def book_scanning_menu():
     os.system('clear')
 
     input_file = select_input_files()
-    error_handling_input(input_file)
+    if input_file not in INPUT_FILES:
+        error_handling_input()
 
     init_solution = select_initial_population()
-    error_handling_input(init_solution)
-
+    if init_solution not in INITIAL_SOLUTIONS:
+        error_handling_input()
+        
     selected_algorithm_key = select_algorithm()
-    error_handling_input(selected_algorithm_key)
+    if selected_algorithm_key not in ALGORITHMS:
+        error_handling_input()
+
 
     selected_algorithm = ALGORITHMS.get(selected_algorithm_key)
 
     start_time = time.time() # Start time 
 
-    best_solution, libraries_shipped, eval_scores = selected_algorithm[0](INPUT_FILES[input_file], INITIAL_SOLUTIONS[init_solution])  
+    best_solution, libraries_shipped, eval_scores = selected_algorithm[0](INPUT_FILES[input_file], INITIAL_SOLUTIONS[init_solution][0])  
     write_data(f'{OUTPUT_FILES[input_file]}', best_solution, libraries_shipped)
         
     end_time = time.time() # End time
@@ -158,13 +162,13 @@ def book_scanning_menu():
 # Helper function to print algorithm information
 def print_info(alg_name, file_path, type_initial_population, eval_scores, time_taken):
     clear_screen()
-    print("-------------------------------------------------------------")
+    print("--------------------------------------------------------------------------------")
     print(f"Algorithm: {alg_name}")
     print(f"File: {file_path}")
     print(f"Initial Solution: {type_initial_population}")
-    print(f"The final score was: {eval_scores}")
+    print(f"The final score was: {max(eval_scores)}")  
     print(f"Time taken: {time_taken:.6f} seconds")
-    print("-------------------------------------------------------------")
+    print("--------------------------------------------------------------------------------")
 
 
 # Get and Print Content of Best Score Menu Function
@@ -206,14 +210,14 @@ def menu():
     clear_screen()
 
    # Print Init UI
-    print("-------------------------------------------------------------")
+    print("--------------------------------------------------------------------------------")
     print("Welcome to our application")
-    print("-------------------------------------------------------------")
+    print("--------------------------------------------------------------------------------")
     print("What do you want to do:")
     print("1. Book Scanning")
     print("2. See the best score for each library")
     print("0. Exit")
-    print("-------------------------------------------------------------")
+    print("--------------------------------------------------------------------------------")
     
     choice = input("Please enter your choice: ")
 

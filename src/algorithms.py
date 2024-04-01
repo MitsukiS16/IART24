@@ -7,7 +7,6 @@ import evaluate_funcs as ef
 import neighbor_funcs as nf
 import mutation_funcs as mf
 import generators as gn
-from generators import generate_random_solution
 import operators as op
 import numpy as np
 import math as m

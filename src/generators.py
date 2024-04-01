@@ -41,6 +41,7 @@ def mutate(child, libraries_shipped, libraries, mutation_func):
                 mutated_child, _ = mutation_func(child, libraries_shipped, libraries, 0)
                 return mutated_child
 
+
 def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info, libraries_shipped):
     visited_libs = []
     canShip_libs = set()
@@ -84,6 +85,37 @@ def generate_random_solution(libraries, diffbooks, shipping_days, libraries_info
 
     libraries_shipped = visited_libs
     return shipped_books_libraries, libraries_shipped
+
+
+def generate_trivial_solution(libraries, diffbooks, shipping_days, libraries_info, libraries_shipped):
+    visited_libs = []
+    canShip_libs = set()
+    shipped_books = set()
+    shipped_books_libraries = set()
+
+    # Sort libraries based on sign-up time
+    sorted_libraries = sorted(libraries_info, key=lambda libID: libraries[libID].sign_up_time)
+    
+    for libID in sorted_libraries:
+        sign_up_time = libraries[libID].sign_up_time
+        if sign_up_time > shipping_days:
+            break  # If sign-up time exceeds available shipping days, stop
+        shipping_days -= sign_up_time  # Deduct sign-up time from available shipping days
+        visited_libs.append(libID)
+        all_books = set(libraries[libID].books.keys())
+        available_books = list(all_books - shipped_books)
+        
+        # Ship books from the current library
+        daily_limit = libraries[libID].shipping_time
+        selected_books = available_books[:daily_limit]  # Select books up to the daily limit
+        for book in selected_books:
+            shipped_books.add(book)
+            shipped_books_libraries.add((book, libID))
+
+    libraries_shipped = visited_libs
+    return shipped_books_libraries, libraries_shipped
+
+
 
 def generate_determined_library_solution(shipped_books_libraries, lib_to_add, best_books):
     
