@@ -175,6 +175,8 @@ def update_data(selected_algorithm_key, input_file, init_solution, eval_scores, 
         lines = f.readlines()
 
     file_name = INPUT_FILES[input_file].split('/')[-1]
+    init_solution_name = INITIAL_SOLUTIONS[init_solution][1]
+    algorithm_name = ALGORITHMS[selected_algorithm_key][1]
 
     for i, line in enumerate(lines[1:], start=1):  
         data = line.strip().split(',')
@@ -182,7 +184,7 @@ def update_data(selected_algorithm_key, input_file, init_solution, eval_scores, 
             old_score = int(data[3])
             old_time = float(data[4])
             if max_score > old_score or (max_score == old_score and elapsed_time < old_time): 
-                lines[i] = f"{file_name}, {init_solution}, {selected_algorithm_key}, {max_score}, {elapsed_time_rounded}\n"
+                lines[i] = f"{file_name}, {init_solution_name}, {algorithm_name}, {max_score}, {elapsed_time_rounded}\n"
                 break
     
     with open('best_score.txt', 'w') as f:
