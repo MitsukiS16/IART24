@@ -9,6 +9,7 @@ This is a Python application designed to given a description of libraries and bo
 ## Installation and Usage
 
 Additionally library: numpy, tabulate, matplotlib, concurrent.futures, hashlib, collections, math , random, copy, sys, os, tkinter
+
 To run our application, follow these simple steps:
 
 1. Open a terminal window
@@ -66,12 +67,17 @@ Each library has to go through a signup process before books from that library c
 
 All books are scanned in the scanning facility. The entire process of sending the books, scanning them, and returning them to the library happens in one day (note that each library has a maximum number of books that can be scanned from this library per day). The scanning facility is big and can scan any number of books per day.
 
-## Deadline
 
-CheckPoint:
-[ ] Presentation (max.5 slides), in pdf format
+### Results
 
-Final:
-[ ] Presentation (max.10 slides), in pdf format
+## Results
 
-### Scoring
+| File  | Score |
+| ------------- | ------------- |
+| a_example ([input](input/a_example.txt) \| [output](output/a_example.out)) | 21 |
+| b_read_on ([input](input/b_read_on.txt) \| [output](output/b_read_on.out)) | 0 |
+| c_incunabula ([input](input/c_incunabula.txt) \| [output](output/c_incunabula.out)) | 0 |
+| d_tough_choices ([input](input/d_tough_choices.txt) \| [output](output/d_tough_choices.out)) | 4,354,090 |
+| e_so_many_books ([input](input/e_so_many_books.txt) \| [output](output/e_so_many_books.out)) | 0 |
+| f_libraries_of_the_world ([input](input/f_libraries_of_the_world.txt) \| [output](output/f_libraries_of_the_world.out)) | 870870 |
+| **Total** | **0** |
