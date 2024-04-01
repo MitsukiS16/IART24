@@ -75,9 +75,9 @@ All books are scanned in the scanning facility. The entire process of sending th
 | File  | Score |
 | ------------- | ------------- |
 | a_example ([input](input/a_example.txt) \| [output](output/a_example.txt)) | 21 |
-| b_read_on ([input](input/b_read_on.txt) \| [output](output/b_read_on.txt)) | 0 |
-| c_incunabula ([input](input/c_incunabula.txt) \| [output](output/c_incunabula.txt)) | 0 |
+| b_read_on ([input](input/b_read_on.txt) \| [output](output/b_read_on.txt)) | 4,443,100 |
+| c_incunabula ([input](input/c_incunabula.txt) \| [output](output/c_incunabula.txt)) | 881,132 |
 | d_tough_choices ([input](input/d_tough_choices.txt) \| [output](output/d_tough_choices.txt)) | 4,354,090 |
 | e_so_many_books ([input](input/e_so_many_books.txt) \| [output](output/e_so_many_books.txt)) | 0 |
-| f_libraries_of_the_world ([input](input/f_libraries_of_the_world.txt) \| [output](output/f_libraries_of_the_world.txt)) | 870870 |
+| f_libraries_of_the_world ([input](input/f_libraries_of_the_world.txt) \| [output](output/f_libraries_of_the_world.txt)) | 870,870 |
 | **Total** | **0** |

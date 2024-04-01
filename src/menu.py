@@ -145,11 +145,12 @@ def book_scanning_menu():
     start_time = time.time() # Start time 
 
     best_solution, libraries_shipped, eval_scores = selected_algorithm[0](INPUT_FILES[input_file], INITIAL_SOLUTIONS[init_solution][0])  
-    write_data(f'{OUTPUT_FILES[input_file]}', best_solution, libraries_shipped)
-        
+    
     end_time = time.time() # End time
     elapsed_time = end_time - start_time 
 
+    update_data(selected_algorithm_key, input_file, init_solution, eval_scores, best_solution, libraries_shipped,elapsed_time)
+    
     print_info(selected_algorithm, input_file, init_solution, eval_scores, elapsed_time)
 
     choice = input("Press 1 for showing the graph of the algorithm; Press 0 for main menu.\n")
@@ -157,6 +158,34 @@ def book_scanning_menu():
         draw_graph(eval_scores)
     menu()
 
+
+def update_data(selected_algorithm_key, input_file, init_solution, eval_scores, best_solution, libraries_shipped, elapsed_time):
+    if isinstance(eval_scores, list):
+        max_score = max(eval_scores)
+    else:
+        max_score = eval_scores
+    
+    with open('best_score.txt', 'r') as f:
+        lines = f.readlines()
+
+    file_name = INPUT_FILES[input_file].split('/')[-1]
+
+    for i, line in enumerate(lines[1:], start=1):  
+        data = line.strip().split(',')
+        if int(i) == int(input_file):  
+            old_score = int(data[3])
+            old_time = float(data[4])
+            if max_score > old_score or (max_score == old_score and elapsed_time < old_time): 
+                lines[i] = f"{file_name}, {init_solution}, {selected_algorithm_key}, {max_score}, {elapsed_time}\n"
+                break
+    
+    with open('best_score.txt', 'w') as f:
+        f.writelines(lines)
+
+    INITIAL_SOLUTIONS[input_file] = (INITIAL_SOLUTIONS[init_solution][0], init_solution)
+    ALGORITHMS[input_file] = ALGORITHMS[selected_algorithm_key]
+
+    write_data(f'{OUTPUT_FILES[input_file]}', best_solution, libraries_shipped)
 
 
 # Helper function to print algorithm information
